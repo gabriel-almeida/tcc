@@ -9,9 +9,9 @@ public class MetricasSimilaridade {
 	 * Wrapper de algumas metricas de similadidade.
 	 * */
 	
-	public static MongeElkan me = new MongeElkan();
-	public static JaroWinkler jw = new JaroWinkler();
-	public static ScaledLevenstein l = new ScaledLevenstein();
+	private static MongeElkan me = new MongeElkan();
+	private static JaroWinkler jw = new JaroWinkler();
+	private static ScaledLevenstein l = new ScaledLevenstein();
 	
 	public static double MongeElkan(String a, String b){
 		return me.score(a, b);

@@ -1,6 +1,10 @@
 package modelo;
 
 public class Elemento {
-	String elementos[];
+	private String elementos[];
+	
+	public String[] getElementos(){
+		return this.elementos;
+	} 
 	
 }
