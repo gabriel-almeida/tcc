@@ -1,12 +1,22 @@
 package aprendizado;
-import modelo.ConjuntoDados;
+import org.jblas.DoubleMatrix;
+import org.jblas.Solve;
 
 
 public class Regressao {
-	public void treina(ConjuntoDados treino){
+	private DoubleMatrix pesos;
+	
+	public void treina(DoubleMatrix matrizTreino, DoubleMatrix target){
+		DoubleMatrix bias = DoubleMatrix.ones(matrizTreino.rows);
+		DoubleMatrix treinoBias = DoubleMatrix.concatVertically(matrizTreino, bias); 
 		
+		DoubleMatrix pseudoInversa = Solve.pinv(treinoBias);
+		this.pesos = pseudoInversa.mul(target);
 	}
-	public ConjuntoDados classifica(ConjuntoDados teste, float limiar){
-		return null;
+
+	public DoubleMatrix classifica(DoubleMatrix matrizTeste){
+		DoubleMatrix bias = DoubleMatrix.ones(matrizTeste.rows);
+		DoubleMatrix testeBias = DoubleMatrix.concatVertically(matrizTeste, bias);
+		return testeBias.mul(pesos);
 	}
 }
