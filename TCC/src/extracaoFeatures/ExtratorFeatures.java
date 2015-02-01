@@ -1,8 +1,9 @@
-package processamento;
+package extracaoFeatures;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import processamento.PreProcessamento;
 import modelo.ConjuntoDados;
 import modelo.Elemento;
 import utilidades.MetricasSimilaridade;
