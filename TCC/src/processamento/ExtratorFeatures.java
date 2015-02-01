@@ -20,6 +20,12 @@ public class ExtratorFeatures {
 		this.elemento1 = new ArrayList<Elemento>();
 		this.elemento2 = new ArrayList<Elemento>();
 	}
+	public Elemento getElemento1(int indice){
+		return elemento1.get(indice);
+	}
+	public Elemento getElemento2(int indice){
+		return elemento2.get(indice);
+	}
 	public void extrai(Elemento e1, Elemento e2){
 		Elemento e1Processado = pp.processa(e1);
 		Elemento e2Processado = pp.processa(e2);
@@ -36,8 +42,7 @@ public class ExtratorFeatures {
 			features.add(me);
 		}
 		this.elemento1.add(e1);
-		this.elemento1.add(e2);
-		int id = this.elemento1.size();
+		this.elemento2.add(e2);
 		this.dataset.adicionaAmostra(features);
 		
 	}
