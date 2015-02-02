@@ -11,9 +11,32 @@ import java.util.Map;
 import modelo.Elemento;
 
 public class EntradaCSV {
-	public static String delimitador = "\";\"";
+	private String delimitador = "\";\"";
+	private List<String> colunasRelevantes;
+	private List<String> tipoColunas;
+	private String arqCsv;
+	
+	private String colunaChave;
+	
+	public EntradaCSV(String arqCsv, List<String> colunasRelevantes, List<String> tipoColunas, String colunaChave) {
+		this.colunasRelevantes = colunasRelevantes;
+		this.colunaChave = colunaChave;
+		this.tipoColunas = tipoColunas;
+		this.arqCsv = arqCsv;
+		if (colunaChave.length() != tipoColunas.size()){
+			throw new RuntimeException("Tamanhos inconsistentes de coluna.");
+		}
+	}
+	
+	public String getDelimitador() {
+		return delimitador;
+	}
+	public void setDelimitador(String delimitador) {
+		this.delimitador = delimitador;
+	}
 
-	public static Map<String, Elemento> leCsv(String arqCsv, List<String> colunasRelevantes, String colunaChave) throws IOException{
+
+	public Map<String, Elemento> leCsv() throws IOException{
 		BufferedReader br = new BufferedReader(new FileReader(arqCsv));
 		Map<String, Elemento> resultado = new HashMap<String, Elemento>();
 		List<Integer> colunasValidas = new ArrayList<Integer>();
@@ -50,7 +73,7 @@ public class EntradaCSV {
 				String chave = campos[indiceChave].replaceAll("\"",""); 
 				chave = chave.substring(0, 9); //TODO substring gambiarra, pensar numa solucao melhor
 
-				Elemento e = new Elemento(chave, colunasRelevantes);
+				Elemento e = new Elemento(chave, colunasRelevantes, tipoColunas);
 				int contador = 0;
 				for (int i: colunasValidas){
 					e.addElemento(contador, campos[i]);

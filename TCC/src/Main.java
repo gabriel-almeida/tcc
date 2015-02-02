@@ -1,27 +1,17 @@
-import java.io.IOException;
-import java.util.Map;
-import java.util.function.BiConsumer;
-
+import modelo.ConjuntoDados;
 import aprendizado.Regressao;
+import aprendizado.Supervisao;
 import avaliacao.Avaliador;
 import avaliacao.ValidacaoCruzada;
-import processamento.ExtratorFeatures;
-import processamento.PreProcessamento;
-import modelo.ConjuntoDados;
-import modelo.Elemento;
-import entrada.EntradaCSV;
-import entrada.Supervisao;
 
 public class Main {
 
-	/*public static void main(String[] args) {
+	public static void main(String[] args) {
 		
 			Supervisao s = new Supervisao();
-			String arq1;
-			String arq2;
 			double teste = 0.10;
 			
-			//ConjuntoDados conjDados = s.preparaBases(arq1, arq2, 10);
+			ConjuntoDados conjDados = s.supervisaoHumana();
 			Regressao regressao = new Regressao();
 			
 			ValidacaoCruzada vc = new ValidacaoCruzada(regressao, conjDados, teste);
@@ -29,7 +19,7 @@ public class Main {
 			a.avalia(0.5);
 			System.out.println(a.acuracia());
 			geraGrafico(a, 0.1);
-	}*/
+	}
 	static void geraGrafico(Avaliador a, double passo){
 		System.out.println("Precisao\tRecall\tF1");
 		for (double i = 0.0; i < 1; i += passo){

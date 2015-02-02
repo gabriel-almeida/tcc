@@ -1,7 +1,9 @@
 package extracaoFeatures;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import processamento.PreProcessamento;
 import modelo.ConjuntoDados;
@@ -13,6 +15,7 @@ public class ExtratorFeatures {
 	private ConjuntoDados dataset;
 	private List<Elemento> elemento1;
 	private List<Elemento> elemento2;
+	private Map<String, Integer> indicesChave;
 	
 	public ExtratorFeatures(PreProcessamento pp){
 		this.pp = pp;
@@ -20,6 +23,10 @@ public class ExtratorFeatures {
 		
 		this.elemento1 = new ArrayList<Elemento>();
 		this.elemento2 = new ArrayList<Elemento>();
+		this.indicesChave = new HashMap<String, Integer>();
+	}
+	public int getIndice(String chave){
+		return indicesChave.get(chave);
 	}
 	public Elemento getElemento1(int indice){
 		return elemento1.get(indice);
@@ -45,7 +52,7 @@ public class ExtratorFeatures {
 		this.elemento1.add(e1);
 		this.elemento2.add(e2);
 		this.dataset.adicionaAmostra(features);
-		
+		this.indicesChave.put(e1.getChave(), this.elemento1.size());
 	}
 	public ConjuntoDados getConjuntoDados(){
 		return this.dataset;
