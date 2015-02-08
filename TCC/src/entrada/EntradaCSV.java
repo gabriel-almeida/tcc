@@ -23,7 +23,7 @@ public class EntradaCSV {
 		this.colunaChave = colunaChave;
 		this.tipoColunas = tipoColunas;
 		this.arqCsv = arqCsv;
-		if (colunaChave.length() != tipoColunas.size()){
+		if (colunasRelevantes.size() != tipoColunas.size()){
 			throw new RuntimeException("Tamanhos inconsistentes de coluna.");
 		}
 	}
@@ -82,7 +82,9 @@ public class EntradaCSV {
 				resultado.put(chave, e);
 
 			}
-
+			if (numeroLinhaAtual% 10000 == 0 ){
+				System.out.println(numeroLinhaAtual);
+			}
 			numeroLinhaAtual++;
 		}
 		br.close();

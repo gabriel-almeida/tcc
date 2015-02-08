@@ -33,7 +33,7 @@ public class Elemento {
 	@Override
 	public Object clone(){
 		Elemento clone =  new Elemento(chave, descritores, tiposDado);
-		Collections.copy(this.elementos, clone.elementos);
+		Collections.copy(clone.elementos, this.elementos);
 		return clone;
 	}
 	public String getChave() {

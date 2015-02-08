@@ -1,6 +1,6 @@
 #Especifica o nome dos arquivos. Obrigatorio
-arquivoBase1		arq1.csv
-arquivoBase2		arq2.csv
+arquivoBase1		PessoasFisicaSIAPA.csv
+arquivoBase2		PessoasFisicasRFB.csv
 
 #Especifica a chave que sera usada como criterio de comparacao para parear ambas bases. Obrigatorio
 colunaChaveBase1	nu_basico_cpf_cgc
@@ -16,7 +16,7 @@ coluna				nome		no_mae_resp			nome_mae
 coluna				data		da_nascimento_resp	data_nascimento
 
 
-arquivoTreino respostas.csv
+arquivoResposta respostas.csv
 colunaChaveResposta	cpf
 
 #Especifica o nome das colunas do arquivo de resposta

@@ -40,6 +40,7 @@ public class PreProcessamento {
 				throw new RuntimeException("Nao foi especificado como se trata o tipo " + tipo);
 			}
 			novoElem = p.processa(novoElem);
+			novoElem = normaliza(novoElem);
 			
 			novo.addElemento(i, novoElem);
 		}

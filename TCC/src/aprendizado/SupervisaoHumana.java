@@ -27,8 +27,8 @@ public class SupervisaoHumana implements Supervisao{
 		ConjuntoDados conjDadosAtual = gerenciador.getConjuntoDados();
 		List<Integer> indicesAmostra = amostragem.amostra(tamLoteAmostra, conjDadosAtual);
 		for (int indice : indicesAmostra){
-			Elemento e1 = gerenciador.getElemento1(indice);
-			Elemento e2 = gerenciador.getElemento2(indice);
+			Elemento e1 = gerenciador.getElementoConjuntoDados1(indice);
+			Elemento e2 = gerenciador.getElementoConjuntoDados2(indice);
 			
 			//TODO Melhorar sysout
 			System.out.println("Chave = " + e1.getChave() );

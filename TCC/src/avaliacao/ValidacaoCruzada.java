@@ -17,12 +17,15 @@ public class ValidacaoCruzada {
 	private List<Integer> indicesTeste;
 	
 	public ValidacaoCruzada(Regressao regressao, ConjuntoDados conjDados, double porcentagemTeste) {
+		this.indicesTeste = new ArrayList<Integer>();
 		this.regressao = regressao;
 		this.conjDados = conjDados;
-		int tamanhoDataset = conjDados.tamanho();
-		int tamanhoTeste = (int) Math.round( tamanhoDataset * porcentagemTeste);
 		
 		this.indicesTreino = conjDados.getIndiceRespostasExistentes();
+		int tamanhoDataset = this.indicesTreino.size();
+		int tamanhoTeste = (int) Math.round( tamanhoDataset * porcentagemTeste);
+		
+		
 		Collections.shuffle(indicesTreino);
 		
 		for (int i=0; i < tamanhoTeste; i++){
@@ -35,10 +38,10 @@ public class ValidacaoCruzada {
 	
 	public Avaliador avalia(){
 		DoubleMatrix matrizTreino = geraMatriz(indicesTreino);
-		DoubleMatrix matrizTargetTreino = geraVetorResposta(indicesTreino);
-		regressao.treina(matrizTreino, matrizTargetTreino);
-		
+		DoubleMatrix matrizTargetTreino = geraVetorResposta(indicesTreino);		
 		DoubleMatrix matrizTeste = geraMatriz(indicesTeste);
+		
+		regressao.treina(matrizTreino, matrizTargetTreino);
 		DoubleMatrix resultado = regressao.classifica(matrizTeste);
 		
 		List<Double> esperado = geraListaResposta(indicesTeste);
@@ -63,13 +66,14 @@ public class ValidacaoCruzada {
 	private List<Double> geraListaResposta(List<Integer> indices){
 		List<Double> respostas = new ArrayList<Double>();
 		for (int i : indices){
-			respostas.add(1.0 * i);
+			double target = this.conjDados.getRespostaEsperada(i);
+			respostas.add(target);
 		}
 		return respostas;
 	}
 	private DoubleMatrix geraVetorResposta(List<Integer> indices){
 		List<Double> respostas = geraListaResposta(indices);
-		return new DoubleMatrix(respostas).transpose();
+		return new DoubleMatrix(respostas);
 	}
 
 }

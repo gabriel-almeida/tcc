@@ -29,7 +29,9 @@ public class ArquivoConfiguracao {
 	private List<String> stopwordsNomes;
 	private Map<String, String> tabelaSubstituicaoNomes;
 
-	public static final String separador = "[ \t]";
+	private String arqSaida;
+	
+	public static final String separador = "[ \t]+";
 	public static final String marcadorComentario = "#";
 	public static final String descritorArquivoBase1 = "arquivoBase1";
 	public static final String descritorArquivoBase2 = "arquivoBase2";
@@ -41,6 +43,8 @@ public class ArquivoConfiguracao {
 	public static final String descritorColunaChaveResposta = "colunaChaveResposta";
 	public static final String descritorColunaResposta = "resposta";
 
+	public static final String descritorArquivoSaida = "arquivoSaida";
+	
 	public static final String descritorStopwords = "stopwordsNome";
 	public static final String descritorTabelaSubstituicao = "abreviacaoNome";
 
@@ -50,13 +54,15 @@ public class ArquivoConfiguracao {
 		colunasBase2 = new ArrayList<String>();
 		stopwordsNomes = new ArrayList<String>();
 		tabelaSubstituicaoNomes = new HashMap<String, String>();
-
+		tipoDadosResposta = new ArrayList<String>();
+		colunasResposta = new ArrayList<String>();
+		
 		BufferedReader br = new BufferedReader(new FileReader(arqConfiguracao));
 
 		while(br.ready()){
 			String linha = br.readLine();
 
-			if (linha.startsWith(marcadorComentario)){
+			if (linha.startsWith(marcadorComentario) || linha.equals("")){
 				continue;
 			}
 
@@ -108,6 +114,9 @@ public class ArquivoConfiguracao {
 				String nomeColunaResposta = campos[2];
 				this.tipoDadosResposta.add(tipoDadoResposta);
 				this.colunasResposta.add(nomeColunaResposta);
+			}
+			else if (campos[0].equals(descritorArquivoSaida)){
+				this.arqSaida = campos[1];
 			}
 			else{
 				br.close();

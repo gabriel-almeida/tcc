@@ -16,7 +16,15 @@ import extracaoFeatures.ExtratorFeatures;
 import extracaoFeatures.IgualdadeNome;
 
 public class Main {
+	public static String arqConfiguracao = "configuracao.txt";
+	public static double porcentagemTeste = 0.10;
+	public static final String parametroPorcentagemTeste = "-teste";
+	public static final String parametroArquivoConfiguracao = "-configuracao";
+	public static final String parametroSupervisaoHumana = "-supervisao-humana";
+	public static final String parametroApenasDataMatching = "-apenas-matching";
+	
 	public static double extraiPorcentagem(String s){
+		
 		double d = Double.parseDouble(s);
 		if (d > 100 || d < 0){
 			throw new RuntimeException("Esperado porcentagem entre 0 e 100, recebido " + d);
@@ -24,27 +32,26 @@ public class Main {
 		return d;
 	} 
 	public static void main(String[] args) {
-		String arqConfiguracao = "configuracao.txt";
-		double porcentagemTeste = 0.10;
 		boolean supervisaoHumana = false;
-
+		
+		//Parseia argumentos de ARGS
 		for (int i = 0; i< args.length; i++){
 			String argumento = args[i];
-			if (argumento.equals("-teste")){
+			if (argumento.equals(parametroPorcentagemTeste)){
 				String s = args[++i];
 				porcentagemTeste = extraiPorcentagem(s);
 			}
-			else if (argumento.equals("-configuracao")){
+			else if (argumento.equals(parametroArquivoConfiguracao)){
 				arqConfiguracao = args[++i];
 			}
-			else if (argumento.equals("-supervisao-humana")){
+			else if (argumento.equals(parametroSupervisaoHumana)){
 				supervisaoHumana = true;
 			}
-			else if (argumento.equals("-apenas-matching")){
+			else if (argumento.equals(parametroApenasDataMatching)){
 				//TODO carregar regressao do arquivo
 			}
 			else {
-				System.out.println("HELP!");
+				throw new RuntimeException("Parametro desconhecido: " + argumento);
 			}
 		}
 		try {
@@ -54,11 +61,10 @@ public class Main {
 			EntradaCSV entradaBase2 = config.getCSVBase2();
 			EntradaCSV entradaResposta = config.getCSVResposta();
 			
-			IgualdadeNome igualdade = new IgualdadeNome();
-			
 			PreProcessamento preprocessamento = config.getPreprocessamento();
 			ExtratorFeatures extratorFeatures = new ExtratorFeatures(preprocessamento);
-
+			
+			IgualdadeNome igualdade = new IgualdadeNome();
 			GerenciadorBases gerenciador = new GerenciadorBases(entradaBase1, entradaBase2, igualdade, extratorFeatures);
 			gerenciador.pareiaBasesComChave();
 
@@ -80,10 +86,10 @@ public class Main {
 			System.out.println(a.acuracia());
 			geraGrafico(a, 0.1);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+	
 	static void geraGrafico(Avaliador a, double passo){
 		System.out.println("Precisao\tRecall\tF1");
 		for (double i = 0.0; i < 1; i += passo){
@@ -91,18 +97,4 @@ public class Main {
 			System.out.println(a.precisaoPositiva() + "\t" + a.recallPositiva() + "\t" + a.f1MeasurePositiva());
 		}
 	}
-	/*public static void main(String args[]){
-		List<String> configuracao1 = new ArrayList<String>();
-		configuracao1.add("no_resp");
-		configuracao1.add("no_mae_resp");
-		configuracao1.add("da_nascimento_resp");
-		List<String> configuracao2 = new ArrayList<String>();
-		configuracao2.add("nome");
-		configuracao2.add("nome_mae");
-		configuracao2.add("data_nascimento");
-		//(arq1, configuracao1, "nu_basico_cpf_cgc");
-		//arq2, configuracao2, "cpf"
-		//Supervisao s = new Supervisao();
-		//s.preparaBases("PessoasFisicaSIAPA.csv", "PessoasFisicasRFB.csv");
-	}*/
 }

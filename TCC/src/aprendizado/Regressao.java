@@ -8,7 +8,7 @@ public class Regressao {
 	
 	private DoubleMatrix adicionaColunaBias(DoubleMatrix matriz){
 		DoubleMatrix bias = DoubleMatrix.ones(matriz.rows);
-		DoubleMatrix matrizComBias = DoubleMatrix.concatVertically(matriz, bias);
+		DoubleMatrix matrizComBias = DoubleMatrix.concatHorizontally(matriz, bias);
 		return matrizComBias;
 	}
 	
@@ -25,6 +25,7 @@ public class Regressao {
 			throw new RuntimeException("ERRO: matriz de teste deveria ter " + (pesos.rows - 1)  + " colunas.");
 		}
 		DoubleMatrix testeBias = adicionaColunaBias(matrizTeste);
-		return testeBias.mul(pesos);
+		DoubleMatrix resposta = testeBias.mmul(pesos);
+		return resposta;
 	}
 }
