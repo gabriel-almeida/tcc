@@ -19,7 +19,6 @@ public class PreProcessamento {
 		tratamentoPorTipo.put("nome", new ProcessadorNome());
 	}
 	
-	
 	public String normaliza(String s){
 		String resultado = Normalizer.normalize(s, Normalizer.Form.NFD);
 		resultado = resultado.toLowerCase();

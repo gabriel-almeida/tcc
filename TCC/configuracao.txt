@@ -1,0 +1,32 @@
+#Especifica o nome dos arquivos. Obrigatorio
+arquivoBase1		arq1.csv
+arquivoBase2		arq2.csv
+
+#Especifica a chave que sera usada como criterio de comparacao para parear ambas bases. Obrigatorio
+colunaChaveBase1	nu_basico_cpf_cgc
+colunaChaveBase2	cpf
+
+arquivoSaida saida.csv
+
+#Especifica o tipo de dado esperados em cada coluna e o descritor e cada uma das bases. Necessario pelo menos um.
+#formato: coluna tipoDado descritorBase1 descritorBase2
+
+coluna				nome		no_resp				nome
+coluna				nome		no_mae_resp			nome_mae
+coluna				data		da_nascimento_resp	data_nascimento
+
+
+arquivoTreino respostas.csv
+colunaChaveResposta	cpf
+
+#Especifica o nome das colunas do arquivo de resposta
+resposta			numero	votoPositivo
+resposta			numero	votoNegativo
+
+#Especifica as stopwords que serao usadas no preprocessamento de dados do tipo nome
+stopwordsNome		de da das do dos senhor doutor
+
+#Especifica as abreviacoes que serao expandidas no preprocessamento de dados do tipo nome
+abreviacaoNome		jr	junior
+abreviacaoNome		sr	senhor
+abreviacaoNome		dr	doutor

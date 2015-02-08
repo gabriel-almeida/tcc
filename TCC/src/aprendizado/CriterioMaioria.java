@@ -2,7 +2,7 @@ package aprendizado;
 
 import modelo.Elemento;
 
-public class TreinoMaioria implements CriterioVotacao {
+public class CriterioMaioria implements CriterioVotacao {
 	private String descritorVotoPositivo;
 	private String descritorVotoNegativo;
 	@Override

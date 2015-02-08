@@ -2,39 +2,31 @@ package extracaoFeatures;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import processamento.PreProcessamento;
-import modelo.ConjuntoDados;
 import modelo.Elemento;
-import utilidades.MetricasSimilaridade;
+import processamento.PreProcessamento;
 
 public class ExtratorFeatures {
 	private PreProcessamento pp;
-	private ConjuntoDados dataset;
-	private List<Elemento> elemento1;
-	private List<Elemento> elemento2;
-	private Map<String, Integer> indicesChave;
+	private Map<String, Extrator> extratorPorTipo;
+	
 	
 	public ExtratorFeatures(PreProcessamento pp){
 		this.pp = pp;
-		this.dataset = new ConjuntoDados();
+		this.extratorPorTipo = new HashMap<String, Extrator>();
 		
-		this.elemento1 = new ArrayList<Elemento>();
-		this.elemento2 = new ArrayList<Elemento>();
-		this.indicesChave = new HashMap<String, Integer>();
+		//Setup padrao do extrator
+		Extrator extrator = new ExtratorMetricasSimilaridade();
+		setExtratorPorTipo("string", extrator);
+		setExtratorPorTipo("data", extrator);
+		setExtratorPorTipo("nome", extrator);
 	}
-	public int getIndice(String chave){
-		return indicesChave.get(chave);
+	public void setExtratorPorTipo(String tipo, Extrator extrator){
+		extratorPorTipo.put(tipo, extrator);
 	}
-	public Elemento getElemento1(int indice){
-		return elemento1.get(indice);
-	}
-	public Elemento getElemento2(int indice){
-		return elemento2.get(indice);
-	}
-	public void extrai(Elemento e1, Elemento e2){
+	
+	public ArrayList<Double> extrai(Elemento e1, Elemento e2){
 		Elemento e1Processado = pp.processa(e1);
 		Elemento e2Processado = pp.processa(e2);
 		ArrayList<Double> features = new ArrayList<Double>();
@@ -42,20 +34,15 @@ public class ExtratorFeatures {
 		for (int i=0; i < e1Processado.tamanho(); i++){
 			String s1 = e1Processado.getElemento(i);
 			String s2 = e2Processado.getElemento(i);
-			//TODO possivelmente melhorar
-			double jw = MetricasSimilaridade.JaroWinkler(s1, s2);
-			double me = MetricasSimilaridade.MongeElkan(s1, s2);
+			String tipoAtual = e1Processado.getTipoDado(i);
 			
-			features.add(jw);
-			features.add(me);
+			Extrator extrator = this.extratorPorTipo.get(tipoAtual);
+			if (extrator == null){
+				throw new RuntimeException("Tipo de dado nao esperado no extrator: " + tipoAtual);
+			}
+			ArrayList<Double> featuresNovas = extrator.extrai(s1, s2);
+			features.addAll(featuresNovas);
 		}
-		this.elemento1.add(e1);
-		this.elemento2.add(e2);
-		this.dataset.adicionaAmostra(features);
-		this.indicesChave.put(e1.getChave(), this.elemento1.size());
+		return features;
 	}
-	public ConjuntoDados getConjuntoDados(){
-		return this.dataset;
-	}
-	
 }

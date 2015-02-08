@@ -1,41 +1,33 @@
 package modelo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ConjuntoDados {
 	List<ArrayList<Double>> matriz = new ArrayList<ArrayList<Double>>();
-	List<Double> respostas = new ArrayList<Double>();
+	Map<Integer, Double> respostas = new HashMap<Integer, Double>();
 
 	public void adicionaAmostra(ArrayList<Double> amostra){
 		this.matriz.add(amostra);
-		this.respostas.add(null);
 	}
 
 	public ArrayList<Double> getAmostra(int i){
 		return this.matriz.get(i);
 
 	}
-	public double getRespostaEsperada(int i){
+	public Double getRespostaEsperada(int i){
 		return this.respostas.get(i);
 	}
 	public void setResposta(int i, double resposta){
-		this.respostas.set(i, resposta);
-	}
-	public List<Integer> getIndiceRespostasExistentes(){
-		ArrayList<Integer> indices = new ArrayList<Integer>();
-		int i = 0;
-		
-		for (Double resposta: this.respostas){
-			if (resposta != null){
-				indices.add(i);
-			}
-			i++;
-		}
-		return indices;
+		this.respostas.put(i, resposta);
 	}
 	
 	public int tamanho(){
 		return this.matriz.size();
+	}
+	public List<Integer> getIndiceRespostasExistentes(){
+		return new ArrayList<Integer>(respostas.keySet());
 	}
 }

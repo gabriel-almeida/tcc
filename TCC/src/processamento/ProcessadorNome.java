@@ -7,20 +7,19 @@ import java.util.List;
 import java.util.Map;
 
 public class ProcessadorNome extends ProcessadorString {
-	private static Map<String, String> mapaSubstituicao;
-	private static List<String> stopwords;
+	public static final Map<String, String> mapaSubstituicaoPadrao;
+	public static final List<String> stopwordsPadrao;
 	
-	//TODO parece feio, melhorar
 	static {
-		mapaSubstituicao = new HashMap<String, String>();
-		mapaSubstituicao.put("jr", "junior");
+		mapaSubstituicaoPadrao = new HashMap<String, String>();
+		mapaSubstituicaoPadrao.put("jr", "junior");
 		
-		stopwords = new ArrayList<String>();
-		stopwords.addAll(Arrays.asList(new String[]{"de", "do", "dos", "da", "das"}));
+		stopwordsPadrao = new ArrayList<String>();
+		stopwordsPadrao.addAll(Arrays.asList(new String[]{"de", "do", "dos", "da", "das"}));
 	}
 	
 	public ProcessadorNome() {
-		super(mapaSubstituicao, stopwords);
+		super(mapaSubstituicaoPadrao, stopwordsPadrao);
 	}
 	public ProcessadorNome(Map<String, String> mapaSubstituicao,
 			List<String> stopwords) {
