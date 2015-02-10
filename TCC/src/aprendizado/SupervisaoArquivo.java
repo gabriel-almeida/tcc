@@ -11,20 +11,28 @@ import entrada.GerenciadorBases;
 public class SupervisaoArquivo implements Supervisao{
 	private CriterioVotacao criterio;
 	private GerenciadorBases gerenciador;
+	private EntradaCSV entrada;
 	
-	public SupervisaoArquivo(EntradaCSV respostasCsv, GerenciadorBases gerenciador) throws IOException{
+	public SupervisaoArquivo(GerenciadorBases gerenciador, EntradaCSV entrada, CriterioVotacao criterio) throws IOException{
 		this.gerenciador = gerenciador;
-		Map<String, Elemento> resposta = respostasCsv.leCsv();
-		for (String chave : resposta.keySet()){
-			Elemento elementoResposta = resposta.get(chave);
-			double target = criterio.criterio(elementoResposta);
-
-			this.gerenciador.setResposta(chave, target);
-		}
+		this.criterio = criterio;
+		this.entrada = entrada;
 	}
 
 	@Override
 	public ConjuntoDados geraConjuntoTreino(){
-		return this.gerenciador.getConjuntoDados();
+		try {
+			Map<String, Elemento> resposta = entrada.leCsv();
+			for (String chave : resposta.keySet()){
+				Elemento elementoResposta = resposta.get(chave);
+				double target = criterio.criterio(elementoResposta);
+
+				this.gerenciador.setResposta(chave, target);
+			}
+			return this.gerenciador.getConjuntoDados();
+
+		} catch (IOException e) {
+			throw new RuntimeException();
+		}
 	}
 }

@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import aprendizado.CriterioMaioria;
+import aprendizado.CriterioVotacao;
 import processamento.PreProcessamento;
 import processamento.Processador;
 import processamento.ProcessadorNome;
@@ -23,13 +25,14 @@ public class ArquivoConfiguracao {
 
 	private String arqRespostas;
 	private String colunaChaveRespostas;
-	private List<String> tipoDadosResposta;
-	private List<String> colunasResposta;
+	private String colunaRespostaPositiva;
+	private String colunaRespostaNegativa;
 
 	private List<String> stopwordsNomes;
 	private Map<String, String> tabelaSubstituicaoNomes;
 
 	private String arqSaida;
+	private String arqRegressao;
 	
 	public static final String separador = "[ \t]+";
 	public static final String marcadorComentario = "#";
@@ -41,9 +44,11 @@ public class ArquivoConfiguracao {
 
 	public static final String descritorArquivoResposta = "arquivoResposta";
 	public static final String descritorColunaChaveResposta = "colunaChaveResposta";
-	public static final String descritorColunaResposta = "resposta";
+	public static final String descritorColunaRespostaPositiva = "respostaPositiva";
+	public static final String descritorColunaRespostaNegativa = "respostaNegativa";
 
 	public static final String descritorArquivoSaida = "arquivoSaida";
+	public static final String descritorArquivoRegressao = "arquivoRegressao";
 	
 	public static final String descritorStopwords = "stopwordsNome";
 	public static final String descritorTabelaSubstituicao = "abreviacaoNome";
@@ -54,8 +59,6 @@ public class ArquivoConfiguracao {
 		colunasBase2 = new ArrayList<String>();
 		stopwordsNomes = new ArrayList<String>();
 		tabelaSubstituicaoNomes = new HashMap<String, String>();
-		tipoDadosResposta = new ArrayList<String>();
-		colunasResposta = new ArrayList<String>();
 		
 		BufferedReader br = new BufferedReader(new FileReader(arqConfiguracao));
 
@@ -109,14 +112,17 @@ public class ArquivoConfiguracao {
 				String expansao = campos[2];
 				this.tabelaSubstituicaoNomes.put(abreviacao, expansao);
 			}
-			else if (campos[0].equals(descritorColunaResposta)){
-				String tipoDadoResposta = campos[1];
-				String nomeColunaResposta = campos[2];
-				this.tipoDadosResposta.add(tipoDadoResposta);
-				this.colunasResposta.add(nomeColunaResposta);
+			else if (campos[0].equals(descritorColunaRespostaPositiva)){
+				this.colunaRespostaPositiva = campos[1];
+			}
+			else if (campos[0].equals(descritorColunaRespostaNegativa)){
+				this.colunaRespostaNegativa = campos[1];
 			}
 			else if (campos[0].equals(descritorArquivoSaida)){
 				this.arqSaida = campos[1];
+			}
+			else if (campos[0].equals(descritorArquivoRegressao)){
+				this.arqRegressao = campos[1];
 			}
 			else{
 				br.close();
@@ -136,6 +142,12 @@ public class ArquivoConfiguracao {
 			return null;
 		} 
 		else{
+			List<String> colunasResposta = new ArrayList<String>();
+			colunasResposta.add(colunaRespostaPositiva);
+			colunasResposta.add(colunaRespostaNegativa);
+			List<String> tipoDadosResposta = new ArrayList<String>();
+			tipoDadosResposta.add("numero");
+			tipoDadosResposta.add("numero");
 			return new EntradaCSV(arqRespostas, colunasResposta, tipoDadosResposta, colunaChaveRespostas);
 		}
 	}
@@ -147,5 +159,10 @@ public class ArquivoConfiguracao {
 
 		return processamento;
 	}
-
+	public String getArquivoRegressao(){
+		return this.arqRegressao;
+	}
+	public CriterioVotacao getVotacaoMaioria(){
+		return new CriterioMaioria(this.colunaRespostaPositiva, this.colunaRespostaNegativa);
+	}
 }

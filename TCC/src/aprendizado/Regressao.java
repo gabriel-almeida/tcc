@@ -1,11 +1,13 @@
 package aprendizado;
+import java.util.List;
+
 import org.jblas.DoubleMatrix;
 import org.jblas.Solve;
 
 
 public class Regressao {
 	private DoubleMatrix pesos;
-	
+	//TODO usar esta classe como wrapper da biblioteca JBLAS
 	private DoubleMatrix adicionaColunaBias(DoubleMatrix matriz){
 		DoubleMatrix bias = DoubleMatrix.ones(matriz.rows);
 		DoubleMatrix matrizComBias = DoubleMatrix.concatHorizontally(matriz, bias);
@@ -28,4 +30,13 @@ public class Regressao {
 		DoubleMatrix resposta = testeBias.mmul(pesos);
 		return resposta;
 	}
+
+	public List<Double> getPesos() {
+		return pesos.elementsAsList();
+	}
+
+	public void setPesos(List<Double> pesos) {
+		this.pesos = new DoubleMatrix(pesos);
+	}
+	
 }

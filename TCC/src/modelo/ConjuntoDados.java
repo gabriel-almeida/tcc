@@ -30,4 +30,17 @@ public class ConjuntoDados {
 	public List<Integer> getIndiceRespostasExistentes(){
 		return new ArrayList<Integer>(respostas.keySet());
 	}
+	/**
+	 * Metodo utilitario que retorna mais de uma resposta,
+	 * baseada na lista de indices passada como argumento
+	 * */
+	
+	public List<Double> geraListaResposta(List<Integer> indices){
+		List<Double> respostas = new ArrayList<Double>();
+		for (int i : indices){
+			double target = getRespostaEsperada(i);
+			respostas.add(target);
+		}
+		return respostas;
+	}
 }

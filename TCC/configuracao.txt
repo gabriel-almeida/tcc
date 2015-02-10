@@ -7,6 +7,7 @@ colunaChaveBase1	nu_basico_cpf_cgc
 colunaChaveBase2	cpf
 
 arquivoSaida saida.csv
+arquivoRegressao pesos.csv
 
 #Especifica o tipo de dado esperados em cada coluna e o descritor e cada uma das bases. Necessario pelo menos um.
 #formato: coluna tipoDado descritorBase1 descritorBase2
@@ -16,12 +17,12 @@ coluna				nome		no_mae_resp			nome_mae
 coluna				data		da_nascimento_resp	data_nascimento
 
 
-arquivoResposta respostas.csv
-colunaChaveResposta	cpf
+arquivoResposta resultadoVotacao.csv
+colunaChaveResposta	ID
 
 #Especifica o nome das colunas do arquivo de resposta
-resposta			numero	votoPositivo
-resposta			numero	votoNegativo
+respostaPositiva	VotosPositivos
+respostaNegativa	VotosNegativos
 
 #Especifica as stopwords que serao usadas no preprocessamento de dados do tipo nome
 stopwordsNome		de da das do dos senhor doutor

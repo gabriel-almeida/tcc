@@ -69,6 +69,9 @@ public class Elemento {
 	public int tamanho(){
 		return this.elementos.size();
 	}
+	public List<String> getDescritores(){
+		return this.descritores;
+	}
 
 	/**
 	 * Este metodo auxiliar pega a coluna relativa na lista de descritores e retornar o indice.

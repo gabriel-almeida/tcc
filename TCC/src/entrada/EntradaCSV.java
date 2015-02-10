@@ -35,7 +35,20 @@ public class EntradaCSV {
 		this.delimitador = delimitador;
 	}
 
+	public List<String> getColunasRelevantes() {
+		return colunasRelevantes;
+	}
 
+	public List<String> getTipoColunas() {
+		return tipoColunas;
+	}
+
+	public String getColunaChave() {
+		return colunaChave;
+	}
+	public String getNomeArquivo() {
+		return arqCsv;
+	}
 	public Map<String, Elemento> leCsv() throws IOException{
 		BufferedReader br = new BufferedReader(new FileReader(arqCsv));
 		Map<String, Elemento> resultado = new HashMap<String, Elemento>();

@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jblas.DoubleMatrix;
+
+import utilidades.Matriz;
 import aprendizado.Regressao;
 import modelo.ConjuntoDados;
 import modelo.Elemento;
@@ -98,8 +101,25 @@ public class GerenciadorBases {
 			i++;
 		}
 	}
-	public void classificaBase(Regressao r){
-		//TODO
+	public Map<String, Double> classificaBase(Regressao r){
+		int tamanhoBase = this.dataset.tamanho();
+
+		//Gero lista com todos os indices
+		List<Integer> indices = new ArrayList<Integer>();
+		for (int i=0; i < tamanhoBase; i++){	
+			indices.add(i);
+		}
+		
+		DoubleMatrix matrizBase = Matriz.geraMatriz(indices, this.dataset);
+		DoubleMatrix classificacaoBase = r.classifica(matrizBase);
+		
+		Map<String, Double> resultado = new HashMap<String, Double>();
+		for (int i = 0; i < tamanhoBase; i++){
+			String chave = this.chavesNoConjuntoDados.get(i);
+			double classificacaoAtual = classificacaoBase.get(i,0);
+			resultado.put(chave, classificacaoAtual);
+		}
+		return resultado;
 	}
 	
 	public void setResposta(String chave, double resposta){
@@ -108,5 +128,32 @@ public class GerenciadorBases {
 	}
 	public void setResposta(int i, double resposta){
 		this.dataset.setResposta(i, resposta);
+	}
+	
+	public void salvaRespostasAtuais(ArquivoConfiguracao config) throws IOException{
+		EntradaCSV treinoCSV = config.getCSVResposta();
+		
+		String colunaChave = treinoCSV.getColunaChave();
+		List<String> descritores = treinoCSV.getColunasRelevantes();
+		String arqNome = treinoCSV.getNomeArquivo();
+		
+		SaidaCSV objSaida = new SaidaCSV(arqNome, colunaChave);
+		
+		List<Elemento> listaTreino = new ArrayList<Elemento>();
+		
+		List<Integer> supervisaoExistente = this.dataset.getIndiceRespostasExistentes();
+		for (Integer indice: supervisaoExistente){
+			String chave = this.chavesNoConjuntoDados.get(indice);
+			
+			Double respostaDada = this.dataset.getRespostaEsperada(indice);
+			int votosPositivos = respostaDada == 1.0? 1 : 0;
+			int votosNegativo = respostaDada == 0.0? 1 : 0;
+			
+			Elemento e = new Elemento(chave, descritores);
+			e.addElemento(0, Integer.toString(votosPositivos));
+			e.addElemento(1, Integer.toString(votosNegativo));
+			listaTreino.add(e);
+		}
+		objSaida.salva(listaTreino);
 	}
 }

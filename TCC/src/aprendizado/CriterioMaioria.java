@@ -5,6 +5,14 @@ import modelo.Elemento;
 public class CriterioMaioria implements CriterioVotacao {
 	private String descritorVotoPositivo;
 	private String descritorVotoNegativo;
+	
+	public CriterioMaioria(String descritorVotoPositivo,
+			String descritorVotoNegativo) {
+		super();
+		this.descritorVotoPositivo = descritorVotoPositivo;
+		this.descritorVotoNegativo = descritorVotoNegativo;
+	}
+	
 	@Override
 	public double criterio(Elemento e) {
 		int positivo = Integer.parseInt(e.getElemento(descritorVotoPositivo));
