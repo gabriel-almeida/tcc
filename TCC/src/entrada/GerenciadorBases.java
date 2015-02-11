@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.jblas.DoubleMatrix;
 
+import utilidades.AnalisePerformace;
 import utilidades.Matriz;
 import aprendizado.Regressao;
 import modelo.ConjuntoDados;
@@ -80,6 +81,8 @@ public class GerenciadorBases {
 		Set<String> chavesComuns = chavesBase1; //legibilidade
 
 		int i=0;
+		AnalisePerformace.zera();
+		AnalisePerformace.capturaTempo(i);
 		//TODO Paralelizar este FOR deve ter bons ganhos de velocidade
 		for (String chave: chavesComuns){ 
 			Elemento e1 = this.base1.get(chave); 
@@ -95,10 +98,11 @@ public class GerenciadorBases {
 			}
 			
 			//LOG Progresso
-			if (i % 10000 == 0){
-				System.out.println(i);
-			}
 			i++;
+			if (i % 10000 == 0){
+				AnalisePerformace.capturaTempo(i);
+				AnalisePerformace.imprimeEstatistica("Parendo Bases");
+			}
 		}
 	}
 	public Map<String, Double> classificaBase(Regressao r){
@@ -123,8 +127,11 @@ public class GerenciadorBases {
 	}
 	
 	public void setResposta(String chave, double resposta){
-		int i = this.indiceChave.get(chave);
-		this.dataset.setResposta(i, resposta);
+		Integer i = this.indiceChave.get(chave);
+		//Caso a chave exista no conj de treino
+		if (i != null){
+			this.dataset.setResposta(i, resposta);
+		}
 	}
 	public void setResposta(int i, double resposta){
 		this.dataset.setResposta(i, resposta);

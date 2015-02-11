@@ -27,7 +27,8 @@ public class ArquivoConfiguracao {
 	private String colunaChaveRespostas;
 	private String colunaRespostaPositiva;
 	private String colunaRespostaNegativa;
-
+	private String tipoDadoPadraoResposta = "numero";
+	
 	private List<String> stopwordsNomes;
 	private Map<String, String> tabelaSubstituicaoNomes;
 
@@ -99,7 +100,7 @@ public class ArquivoConfiguracao {
 				this.arqRespostas = campos[1];
 			}
 			else if (campos[0].equals(descritorColunaChaveResposta)){
-				this.arqRespostas = campos[1];
+				this.colunaChaveRespostas= campos[1];
 			}
 			else if (campos[0].equals(descritorStopwords)){
 				for (int i=1; i < campos.length; i++){
@@ -138,6 +139,7 @@ public class ArquivoConfiguracao {
 		return new EntradaCSV(arqBase2, colunasBase2, tiposDado, chaveBase2);
 	}
 	public EntradaCSV getCSVResposta(){
+		//TODO talvez remover
 		if (this.arqRespostas == null){
 			return null;
 		} 
@@ -145,16 +147,19 @@ public class ArquivoConfiguracao {
 			List<String> colunasResposta = new ArrayList<String>();
 			colunasResposta.add(colunaRespostaPositiva);
 			colunasResposta.add(colunaRespostaNegativa);
+			
+			//Necessario criar lista de tipo de dados
 			List<String> tipoDadosResposta = new ArrayList<String>();
-			tipoDadosResposta.add("numero");
-			tipoDadosResposta.add("numero");
+			tipoDadosResposta.add(this.tipoDadoPadraoResposta);
+			tipoDadosResposta.add(this.tipoDadoPadraoResposta);
+			
 			return new EntradaCSV(arqRespostas, colunasResposta, tipoDadosResposta, colunaChaveRespostas);
 		}
 	}
 	public PreProcessamento getPreprocessamento(){
 		PreProcessamento processamento = new PreProcessamento();
 		Processador p = new ProcessadorNome(this.tabelaSubstituicaoNomes, this.stopwordsNomes);
-
+		//TODO refatorar pre processamento
 		processamento.setTratamento("nome", p);
 
 		return processamento;

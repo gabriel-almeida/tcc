@@ -33,7 +33,7 @@ public class SaidaCSV{
 					bw.write(descritor);
 					bw.write(aspasString);
 				}
-
+				bw.write("\n");
 			}
 			
 			int quantElementos = e.tamanho();

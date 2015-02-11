@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import utilidades.AnalisePerformace;
 import modelo.Elemento;
 
 public class EntradaCSV {
@@ -59,11 +60,14 @@ public class EntradaCSV {
 		for (int i=0; i< colunasRelevantes.size(); i++){
 			colunasValidas.add(-1);
 		}
-
+		//LOG tempo
 		int numeroLinhaAtual=0;
+		AnalisePerformace.zera();
+		AnalisePerformace.capturaTempo(numeroLinhaAtual);
+		
 		while(br.ready()){
 			String linha = br.readLine();
-			String campos[] = linha.split(delimitador);
+			String campos[] = linha.split(delimitador);//TODO pensar em algo melhor
 
 			//Localizo os cabecalhos relevantes e boto seus indices na ordem da lista de nomes
 			if (numeroLinhaAtual == 0){
@@ -82,23 +86,26 @@ public class EntradaCSV {
 				}
 			}
 			else{
-
+				//TODO pensar em algo melhor do que essa remocao de aspas
 				String chave = campos[indiceChave].replaceAll("\"",""); 
 				chave = chave.substring(0, 9); //TODO substring gambiarra, pensar numa solucao melhor
 
 				Elemento e = new Elemento(chave, colunasRelevantes, tipoColunas);
 				int contador = 0;
 				for (int i: colunasValidas){
-					e.addElemento(contador, campos[i]);
+					e.addElemento(contador, campos[i].replaceAll("\"", ""));
 					contador++;
 				}
 				resultado.put(chave, e);
 
 			}
-			if (numeroLinhaAtual% 10000 == 0 ){
-				System.out.println(numeroLinhaAtual);
-			}
+			//Log Tempo
 			numeroLinhaAtual++;
+			if (numeroLinhaAtual% 10000 == 0 ){
+				AnalisePerformace.capturaTempo(numeroLinhaAtual);
+				AnalisePerformace.imprimeEstatistica("Lendo " + arqCsv);
+			}
+			
 		}
 		br.close();
 		return resultado;

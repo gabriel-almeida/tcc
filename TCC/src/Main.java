@@ -78,7 +78,7 @@ public class Main {
 					sup = new SupervisaoHumana(amostragem, gerenciador);
 				} 
 				else{
-					sup = new SupervisaoArquivo(entradaResposta, gerenciador);
+					sup = new SupervisaoArquivo(gerenciador, config.getCSVResposta(), config.getVotacaoMaioria());
 				}
 
 				ConjuntoDados conjDados = sup.geraConjuntoTreino();
@@ -88,7 +88,7 @@ public class Main {
 				Avaliador a = vc.avalia();
 				a.avalia(0.5);
 				System.out.println(a.acuracia());
-				geraGrafico(a, 0.1);
+				geraGrafico(a, 0.01);
 				
 				sr.salvaPesos(regressao, config.getArquivoRegressao());
 			}
@@ -101,12 +101,12 @@ public class Main {
 			e.printStackTrace();
 		}
 	}
-
+	static String separador = ";";
 	static void geraGrafico(Avaliador a, double passo){
-		System.out.println("Precisao\tRecall\tF1");
-		for (double i = 0.0; i < 1; i += passo){
+		System.out.println("Precisao"+separador+"Recall"+separador+"F1");
+		for (double i = 0.0; i <= 1; i += passo){
 			a.avalia(i);
-			System.out.println(a.precisaoPositiva() + "\t" + a.recallPositiva() + "\t" + a.f1MeasurePositiva());
+			System.out.println(a.precisaoPositiva() + separador + a.recallPositiva() + separador + a.f1MeasurePositiva());
 		}
 	}
 }
