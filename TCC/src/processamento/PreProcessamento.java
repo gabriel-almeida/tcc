@@ -14,13 +14,14 @@ public class PreProcessamento {
 	}
 	public PreProcessamento() {
 		tratamentoPorTipo = new HashMap<String, Processador>();
-		tratamentoPorTipo.put("string", new ProcessadorString());
+		//TODO melhorar!
+		tratamentoPorTipo.put("string", new ProcessadorNome());
 		tratamentoPorTipo.put("data", new ProcessadorData());
 		tratamentoPorTipo.put("nome", new ProcessadorNome());
 	}
 	
 	public String normaliza(String s){
-		String resultado = Normalizer.normalize(s, Normalizer.Form.NFD);
+		String resultado = Normalizer.normalize(s, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");;
 		resultado = resultado.toLowerCase();
 		resultado = resultado.replaceAll("[ ]+", " ");
 		resultado = resultado.trim();

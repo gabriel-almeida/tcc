@@ -18,7 +18,7 @@ import extracaoFeatures.IgualdadeNome;
 
 public class Main {
 	public static String arqConfiguracao = "configuracao.txt";
-	public static double porcentagemTeste = 0.10;
+	public static double porcentagemTeste = 0.30;
 	public static final String parametroPorcentagemTeste = "-teste";
 	public static final String parametroArquivoConfiguracao = "-configuracao";
 	public static final String parametroSupervisaoHumana = "-supervisao-humana";
@@ -82,13 +82,14 @@ public class Main {
 				}
 
 				ConjuntoDados conjDados = sup.geraConjuntoTreino();
+				System.out.println(conjDados.getIndiceRespostasExistentes().size() + " respostas");
 				Regressao regressao = new Regressao();
 
 				ValidacaoCruzada vc = new ValidacaoCruzada(regressao, conjDados, porcentagemTeste);
 				Avaliador a = vc.avalia();
 				a.avalia(0.5);
 				System.out.println(a.acuracia());
-				geraGrafico(a, 0.01);
+				//geraGrafico(a, 0.01);
 				
 				sr.salvaPesos(regressao, config.getArquivoRegressao());
 			}

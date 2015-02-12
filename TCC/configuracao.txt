@@ -13,7 +13,7 @@ arquivoRegressao pesos.csv
 #formato: coluna tipoDado descritorBase1 descritorBase2
 
 coluna				nome		no_resp				nome
-coluna				nome		no_mae_resp			nome_mae
+coluna				string		no_mae_resp			nome_mae
 coluna				data		da_nascimento_resp	data_nascimento
 
 

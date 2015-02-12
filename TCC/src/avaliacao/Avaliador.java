@@ -52,7 +52,7 @@ public class Avaliador {
 	public void avalia(double limiar){
 		for (int i = 0; i < esperado.size(); i++){
 			double target = esperado.get(i);
-			double obtido = recebido.get(i) > limiar? 1.0: 0.0;
+			double obtido = recebido.get(i) >= limiar? 1.0: 0.0; //TODO cuidado ao mudar o target
 
 			if (target == obtido){
 				if (obtido==1.0){

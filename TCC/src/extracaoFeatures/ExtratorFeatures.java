@@ -17,10 +17,12 @@ public class ExtratorFeatures {
 		this.extratorPorTipo = new HashMap<String, Extrator>();
 		
 		//Setup padrao do extrator
-		Extrator extrator = new ExtratorMetricasSimilaridade();
-		setExtratorPorTipo("string", extrator);
-		setExtratorPorTipo("data", extrator);
-		setExtratorPorTipo("nome", extrator);
+		Extrator extratorNome = new ExtratorMetricasSimilaridade();
+		Extrator extratorData= new ExtratorData();
+		Extrator extratorString= new ExtratorJaroWinkler();
+		setExtratorPorTipo("string", extratorNome);
+		setExtratorPorTipo("nome", extratorNome);
+		setExtratorPorTipo("data", extratorData);
 	}
 	public void setExtratorPorTipo(String tipo, Extrator extrator){
 		extratorPorTipo.put(tipo, extrator);

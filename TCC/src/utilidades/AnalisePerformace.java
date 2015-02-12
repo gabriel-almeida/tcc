@@ -36,6 +36,7 @@ public class AnalisePerformace {
 		}
 		//media /= (tempo.size()-1);
 		System.out.println( "Min " + leituraHumana(pior) + " / Med " + leituraHumana(media) + " / Max " + leituraHumana(melhor)+ " operacoes por segundo | " + operacao );
+		tempo.set(tempo.size() - 1, System.currentTimeMillis()); //torna a prox medicao mais justa, removendo o tempo de execucao dessa rotina
 	}
 	
 	private static double divisor = 1000;

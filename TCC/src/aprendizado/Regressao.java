@@ -19,6 +19,8 @@ public class Regressao {
 			throw new RuntimeException("ERRO: matriz de target deve ter mesma quantidade de linhas que a matriz de treino");
 		}
 		DoubleMatrix treinoBias = adicionaColunaBias(matrizTreino);
+		//DoubleMatrix pseudoInversa = Solve.pinv(treinoBias);
+		//this.pesos = pseudoInversa.mmul(target);
 		this.pesos = Solve.solveLeastSquares(treinoBias, target);
 	}
 
