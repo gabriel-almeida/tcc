@@ -103,10 +103,10 @@ public class EntradaCSV {
 			numeroLinhaAtual++;
 			if (numeroLinhaAtual% 10000 == 0 ){
 				AnalisePerformace.capturaTempo(numeroLinhaAtual);
-				AnalisePerformace.imprimeEstatistica("Lendo " + arqCsv);
 			}
 			
 		}
+		AnalisePerformace.imprimeEstatistica("Lendo " + arqCsv);
 		br.close();
 		return resultado;
 	}

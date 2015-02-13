@@ -7,14 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 import modelo.Elemento;
-import aprendizado.Regressao;
+import aprendizado.RegressaoLinear;
 
 public class SerializacaoRegressao {
 
 	private String descritorColunaPeso = "PesoRegressao";
 	private String descritorColunaChave = "Indice";
-
-	public void salvaPesos(Regressao r, String arqSaida) throws IOException{
+	//TODO refazer
+	public void salvaPesos(RegressaoLinear r, String arqSaida) throws IOException{
 		SaidaCSV saida = new SaidaCSV(arqSaida, descritorColunaChave);
 
 		List<Double> pesos = r.getPesos();
@@ -44,7 +44,7 @@ public class SerializacaoRegressao {
 	/**
 	 * Carrega um arquivo de pesos, retornando um objeto Regressao. Tal arquivo preferencialmente deve ser salvo pelo metodo desta classe
 	 * */
-	public Regressao carregaPesos(String arqPesos) throws IOException{
+	public RegressaoLinear carregaPesos(String arqPesos) throws IOException{
 		//PS: Tratamento deste arquivo eh feito de forma similar ao arquivo das bases de dados, por isso a confusao na conversao entre tipos 
 		List<String> colunasRelevantes = getListaDescritor();
 		List<String> tipoColuna = new ArrayList<String>();
@@ -63,7 +63,7 @@ public class SerializacaoRegressao {
 			
 			pesosFinais.set(indice, peso);
 		}
-		Regressao regressao = new Regressao();
+		RegressaoLinear regressao = new RegressaoLinear();
 		regressao.setPesos(pesosFinais);
 		
 		return regressao;

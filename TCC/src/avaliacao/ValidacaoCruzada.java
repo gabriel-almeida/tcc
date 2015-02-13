@@ -10,6 +10,7 @@ import org.jblas.DoubleMatrix;
 
 import utilidades.Matriz;
 import aprendizado.Regressao;
+import aprendizado.RegressaoLinear;
 
 public class ValidacaoCruzada {
 	private Regressao regressao;
@@ -38,15 +39,9 @@ public class ValidacaoCruzada {
 	}
 	
 	public Avaliador avalia(){
-		DoubleMatrix matrizTreino = Matriz.geraMatriz(indicesTreino, conjDados);
-		DoubleMatrix matrizTargetTreino = Matriz.geraVetorResposta(indicesTreino, conjDados);		
-		DoubleMatrix matrizTeste = Matriz.geraMatriz(indicesTeste, conjDados);
-		
-		regressao.treina(matrizTreino, matrizTargetTreino);
-		DoubleMatrix resultado = regressao.classifica(matrizTeste);
-		
-		List<Double> esperado = conjDados.geraListaResposta(indicesTeste);
-		List<Double> recebido = resultado.elementsAsList(); 
+		regressao.treina(conjDados, indicesTreino);
+		List<Double> recebido  = regressao.classifica(conjDados, indicesTeste);
+		List<Double> esperado = conjDados.geraListaResposta(indicesTeste); 
 		
 		return new Avaliador(esperado, recebido);
 	}

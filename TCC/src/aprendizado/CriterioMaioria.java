@@ -1,5 +1,6 @@
 package aprendizado;
 
+import utilidades.Constantes;
 import modelo.Elemento;
 
 public class CriterioMaioria implements CriterioVotacao {
@@ -17,7 +18,7 @@ public class CriterioMaioria implements CriterioVotacao {
 	public double criterio(Elemento e) {
 		int positivo = Integer.parseInt(e.getElemento(descritorVotoPositivo));
 		int negativo = Integer.parseInt(e.getElemento(descritorVotoNegativo));
-		return positivo>negativo? 1.0:0.0;
+		return positivo>negativo? Constantes.valorPositivo : Constantes.valorNegativo; //TODO tomar cuidado com isso
 	}
 
 	@Override

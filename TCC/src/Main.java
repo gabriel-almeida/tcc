@@ -3,6 +3,9 @@ import java.io.IOException;
 import modelo.ConjuntoDados;
 import processamento.PreProcessamento;
 import aprendizado.Regressao;
+import aprendizado.RegressaoLinear;
+import aprendizado.RegressaoLogistica;
+import aprendizado.RegressaoZero;
 import aprendizado.Supervisao;
 import aprendizado.SupervisaoArquivo;
 import aprendizado.SupervisaoHumana;
@@ -37,7 +40,7 @@ public class Main {
 		boolean apenasMatching	= false;
 
 		SerializacaoRegressao sr = new SerializacaoRegressao();
-		
+
 		//Parseia argumentos de ARGS
 		for (int i = 0; i< args.length; i++){
 			String argumento = args[i];
@@ -83,24 +86,31 @@ public class Main {
 
 				ConjuntoDados conjDados = sup.geraConjuntoTreino();
 				System.out.println(conjDados.getIndiceRespostasExistentes().size() + " respostas");
-				Regressao regressao = new Regressao();
-
-				ValidacaoCruzada vc = new ValidacaoCruzada(regressao, conjDados, porcentagemTeste);
-				Avaliador a = vc.avalia();
-				a.avalia(0.5);
-				System.out.println(a.acuracia());
-				//geraGrafico(a, 0.01);
 				
-				sr.salvaPesos(regressao, config.getArquivoRegressao());
+				analiseAlgoritmo(new RegressaoZero(), conjDados);
+				analiseAlgoritmo(new RegressaoLinear(), conjDados);
+				analiseAlgoritmo(new RegressaoLogistica(), conjDados);
+				//geraGrafico(a, 0.01);
+
+				//sr.salvaPesos(regressao, config.getArquivoRegressao());
 			}
 			else{
-				Regressao regressao = sr.carregaPesos(config.getArquivoRegressao());
-				
+				RegressaoLinear regressao = sr.carregaPesos(config.getArquivoRegressao());
+
 			}
 			//TODO salvar base
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	public static void analiseAlgoritmo(Regressao regressao, ConjuntoDados conjDados){
+		System.out.println(regressao.getClass().getName());
+		ValidacaoCruzada vc = new ValidacaoCruzada(regressao, conjDados, porcentagemTeste);
+		Avaliador a = vc.avalia();
+		a.avalia(0.5);
+		System.out.println();
+		System.out.println(a);
+		
 	}
 	static String separador = ";";
 	static void geraGrafico(Avaliador a, double passo){

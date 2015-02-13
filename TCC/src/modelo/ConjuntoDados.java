@@ -38,7 +38,10 @@ public class ConjuntoDados {
 	public List<Double> geraListaResposta(List<Integer> indices){
 		List<Double> respostas = new ArrayList<Double>();
 		for (int i : indices){
-			double target = getRespostaEsperada(i);
+			Double target = getRespostaEsperada(i);
+			if (target == null){
+				throw new RuntimeException("Indice " + i + " nao tem resposta.");
+			}
 			respostas.add(target);
 		}
 		return respostas;

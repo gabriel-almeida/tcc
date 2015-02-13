@@ -11,7 +11,7 @@ import org.jblas.DoubleMatrix;
 
 import utilidades.AnalisePerformace;
 import utilidades.Matriz;
-import aprendizado.Regressao;
+import aprendizado.RegressaoLinear;
 import modelo.ConjuntoDados;
 import modelo.Elemento;
 import extracaoFeatures.CondicaoIgualdade;
@@ -93,7 +93,7 @@ public class GerenciadorBases {
 			if (!iguais){
 				ArrayList<Double> features = extrator.extrai(e1, e2);
 				this.dataset.adicionaAmostra(features);
-				this.indiceChave.put(chave, this.dataset.tamanho());
+				this.indiceChave.put(chave, this.indiceChave.size());
 				this.chavesNoConjuntoDados.add(chave);
 			}
 			
@@ -101,11 +101,12 @@ public class GerenciadorBases {
 			i++;
 			if (i % 10000 == 0){
 				AnalisePerformace.capturaTempo(i);
-				AnalisePerformace.imprimeEstatistica("Parendo Bases");
 			}
+			
 		}
+		AnalisePerformace.imprimeEstatistica("Parendo Bases");
 	}
-	public Map<String, Double> classificaBase(Regressao r){
+	/*public Map<String, Double> classificaBase(RegressaoLinear r){
 		int tamanhoBase = this.dataset.tamanho();
 
 		//Gero lista com todos os indices
@@ -124,7 +125,7 @@ public class GerenciadorBases {
 			resultado.put(chave, classificacaoAtual);
 		}
 		return resultado;
-	}
+	}*/
 	
 	public void setResposta(String chave, double resposta){
 		Integer i = this.indiceChave.get(chave);
@@ -137,7 +138,8 @@ public class GerenciadorBases {
 		this.dataset.setResposta(i, resposta);
 	}
 	
-	public void salvaRespostasAtuais(ArquivoConfiguracao config) throws IOException{
+	/*TODO refazer
+	 * public void salvaRespostasAtuais(ArquivoConfiguracao config) throws IOException{
 		EntradaCSV treinoCSV = config.getCSVResposta();
 		
 		String colunaChave = treinoCSV.getColunaChave();
@@ -162,5 +164,5 @@ public class GerenciadorBases {
 			listaTreino.add(e);
 		}
 		objSaida.salva(listaTreino);
-	}
+	}*/
 }

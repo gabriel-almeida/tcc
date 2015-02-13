@@ -25,5 +25,10 @@ public abstract class Matriz {
 		List<Double> respostas = conjDados.geraListaResposta(indices);
 		return new DoubleMatrix(respostas);
 	}
+	public static DoubleMatrix adicionaColunaBias(DoubleMatrix matriz){
+		DoubleMatrix bias = DoubleMatrix.ones(matriz.rows);
+		DoubleMatrix matrizComBias = DoubleMatrix.concatHorizontally(matriz, bias);
+		return matrizComBias;
+	}
 
 }

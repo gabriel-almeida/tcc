@@ -31,12 +31,12 @@ public class AnalisePerformace {
 			if (performace < pior){
 				pior = performace;
 			}
-			media += (performace - media) * (1.0/i);
+			media = media*0.99 + (performace - media) * (1.0/i);
 			//media += performace;
 		}
 		//media /= (tempo.size()-1);
 		System.out.println( "Min " + leituraHumana(pior) + " / Med " + leituraHumana(media) + " / Max " + leituraHumana(melhor)+ " operacoes por segundo | " + operacao );
-		tempo.set(tempo.size() - 1, System.currentTimeMillis()); //torna a prox medicao mais justa, removendo o tempo de execucao dessa rotina
+		//tempo.set(tempo.size() - 1, System.currentTimeMillis()); //torna a prox medicao mais justa, removendo o tempo de execucao dessa rotina
 	}
 	
 	private static double divisor = 1000;
