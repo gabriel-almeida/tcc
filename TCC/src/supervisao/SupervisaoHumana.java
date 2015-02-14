@@ -1,14 +1,15 @@
-package aprendizado;
+package supervisao;
 
 import java.util.List;
 import java.util.Scanner;
 
 import modelo.ConjuntoDados;
 import modelo.Elemento;
-import entrada.AmostragemAleatoria;
-import entrada.GerenciadorBases;
+import entrada_saida.AmostragemAleatoria;
+import entrada_saida.GerenciadorBases;
 
 public class SupervisaoHumana implements Supervisao{
+	//TODO melhorar classe toda
 	private AmostragemAleatoria amostragem;
 	private GerenciadorBases gerenciador;
 	private int tamLoteAmostra = 10;

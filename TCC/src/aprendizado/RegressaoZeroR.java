@@ -7,13 +7,12 @@ import java.util.List;
 import modelo.ConjuntoDados;
 import utilidades.Matriz;
 
-public class RegressaoZero implements Regressao {
+public class RegressaoZeroR implements Regressao {
 	private double resposta;
 	
 	@Override
 	public void treina(ConjuntoDados conjDados, List<Integer> indices) {
 		this.resposta = Matriz.geraVetorResposta(indices, conjDados).mean();
-		System.out.println("media = " + resposta);
 	}
 
 	@Override

@@ -54,7 +54,7 @@ public class Avaliador {
 	public void avalia(double limiar){
 		for (int i = 0; i < esperado.size(); i++){
 			double target = esperado.get(i);
-			double obtido = recebido.get(i) > limiar? Constantes.valorPositivo: Constantes.valorNegativo; //TODO cuidado ao mudar o target
+			double obtido = recebido.get(i) > limiar? Constantes.valorPositivo: Constantes.valorNegativo;
 
 			if (target == obtido){
 				if (obtido==1.0){
@@ -101,7 +101,9 @@ public class Avaliador {
 		return 2.0*precisaoNegativo()*recallNegativo()/(precisaoNegativo() + recallNegativo());
 	}
 	public String toString(){
-		String s = "Acuracia = %f\n"
+		String s = "ESTATISTICAS:\n"
+				+ "==============================\n"
+				+ "Acuracia  = %f\n"
 				+ "Precisao  = %f (%f)\n"
 				+ "Recall    = %f (%f)\n"
 				+ "F1        = %f (%f)\n"

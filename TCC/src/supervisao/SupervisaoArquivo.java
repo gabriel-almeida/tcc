@@ -1,12 +1,12 @@
-package aprendizado;
+package supervisao;
 
 import java.io.IOException;
 import java.util.Map;
 
 import modelo.ConjuntoDados;
 import modelo.Elemento;
-import entrada.EntradaCSV;
-import entrada.GerenciadorBases;
+import entrada_saida.EntradaCSV;
+import entrada_saida.GerenciadorBases;
 
 public class SupervisaoArquivo implements Supervisao{
 	private CriterioVotacao criterio;

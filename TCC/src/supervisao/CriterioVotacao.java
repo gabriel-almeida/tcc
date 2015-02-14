@@ -1,4 +1,4 @@
-package aprendizado;
+package supervisao;
 
 import modelo.Elemento;
 

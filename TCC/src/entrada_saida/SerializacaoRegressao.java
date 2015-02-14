@@ -1,4 +1,4 @@
-package entrada;
+package entrada_saida;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,10 +10,10 @@ import modelo.Elemento;
 import aprendizado.RegressaoLinear;
 
 public class SerializacaoRegressao {
-
+	//TODO refazer esta classe de Serializacao
 	private String descritorColunaPeso = "PesoRegressao";
 	private String descritorColunaChave = "Indice";
-	//TODO refazer
+	
 	public void salvaPesos(RegressaoLinear r, String arqSaida) throws IOException{
 		SaidaCSV saida = new SaidaCSV(arqSaida, descritorColunaChave);
 

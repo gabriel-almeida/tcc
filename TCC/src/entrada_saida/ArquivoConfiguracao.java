@@ -1,4 +1,4 @@
-package entrada;
+package entrada_saida;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -8,11 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import aprendizado.CriterioMaioria;
-import aprendizado.CriterioVotacao;
 import processamento.PreProcessamento;
 import processamento.Processador;
 import processamento.ProcessadorNome;
+import supervisao.CriterioMaioria;
+import supervisao.CriterioVotacao;
 
 public class ArquivoConfiguracao {
 	private String arqBase1;

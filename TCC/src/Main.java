@@ -2,20 +2,20 @@ import java.io.IOException;
 
 import modelo.ConjuntoDados;
 import processamento.PreProcessamento;
+import supervisao.Supervisao;
+import supervisao.SupervisaoArquivo;
+import supervisao.SupervisaoHumana;
 import aprendizado.Regressao;
 import aprendizado.RegressaoLinear;
 import aprendizado.RegressaoLogistica;
-import aprendizado.RegressaoZero;
-import aprendizado.Supervisao;
-import aprendizado.SupervisaoArquivo;
-import aprendizado.SupervisaoHumana;
+import aprendizado.RegressaoZeroR;
 import avaliacao.Avaliador;
 import avaliacao.ValidacaoCruzada;
-import entrada.AmostragemAleatoria;
-import entrada.ArquivoConfiguracao;
-import entrada.EntradaCSV;
-import entrada.GerenciadorBases;
-import entrada.SerializacaoRegressao;
+import entrada_saida.AmostragemAleatoria;
+import entrada_saida.ArquivoConfiguracao;
+import entrada_saida.EntradaCSV;
+import entrada_saida.GerenciadorBases;
+import entrada_saida.SerializacaoRegressao;
 import extracaoFeatures.ExtratorFeatures;
 import extracaoFeatures.IgualdadeNome;
 
@@ -87,7 +87,7 @@ public class Main {
 				ConjuntoDados conjDados = sup.geraConjuntoTreino();
 				System.out.println(conjDados.getIndiceRespostasExistentes().size() + " respostas");
 				
-				analiseAlgoritmo(new RegressaoZero(), conjDados);
+				analiseAlgoritmo(new RegressaoZeroR(), conjDados);
 				analiseAlgoritmo(new RegressaoLinear(), conjDados);
 				analiseAlgoritmo(new RegressaoLogistica(), conjDados);
 				//geraGrafico(a, 0.01);

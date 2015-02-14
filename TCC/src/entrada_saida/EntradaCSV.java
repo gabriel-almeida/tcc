@@ -1,4 +1,4 @@
-package entrada;
+package entrada_saida;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
