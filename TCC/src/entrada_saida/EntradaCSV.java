@@ -4,20 +4,21 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import utilidades.AnalisePerformace;
 import modelo.Elemento;
+import utilidades.AnalisePerformace;
 
 public class EntradaCSV {
 	private String delimitador = "\";\"";
 	private List<String> colunasRelevantes;
 	private List<String> tipoColunas;
 	private String arqCsv;
-	
+
 	private String colunaChave;
+	private int indiceChave;
 	
 	public EntradaCSV(String arqCsv, List<String> colunasRelevantes, List<String> tipoColunas, String colunaChave) {
 		this.colunasRelevantes = colunasRelevantes;
@@ -28,7 +29,7 @@ public class EntradaCSV {
 			throw new RuntimeException("Tamanhos inconsistentes de coluna.");
 		}
 	}
-	
+
 	public String getDelimitador() {
 		return delimitador;
 	}
@@ -50,64 +51,64 @@ public class EntradaCSV {
 	public String getNomeArquivo() {
 		return arqCsv;
 	}
+	/**
+	 * Implementacao concorrente da leitura de CSV. 
+	 * O mapa retornado eh thread-safe
+	 * */
 	public Map<String, Elemento> leCsv() throws IOException{
 		BufferedReader br = new BufferedReader(new FileReader(arqCsv));
-		Map<String, Elemento> resultado = new HashMap<String, Elemento>();
+
+		Map<String, Elemento> resultado = new ConcurrentHashMap<String, Elemento>();
 		List<Integer> colunasValidas = new ArrayList<Integer>();
-		int indiceChave = -1;
+		
+		indiceChave = -1;
 
 		//inicializo essa lista com indices -1
 		for (int i=0; i< colunasRelevantes.size(); i++){
 			colunasValidas.add(-1);
 		}
 		//LOG tempo
-		int numeroLinhaAtual=0;
 		AnalisePerformace.zera();
-		AnalisePerformace.capturaTempo(numeroLinhaAtual);
-		
-		while(br.ready()){
-			String linha = br.readLine();
-			String campos[] = linha.split(delimitador);//TODO pensar em algo melhor
+		AnalisePerformace.capturaTempo(0);
 
-			//Localizo os cabecalhos relevantes e boto seus indices na ordem da lista de nomes
-			if (numeroLinhaAtual == 0){
-				for (int i = 0; i< campos.length; i++){
-					String nomeColunaAtual = campos[i].replaceAll("\"", "");
+		//Localizo os cabecalhos relevantes e boto seus indices na ordem da lista de nomes
+		String cabecalho[] = br.readLine().split(delimitador);
+		for (int i = 0; i< cabecalho.length; i++){
+			String nomeColunaAtual = cabecalho[i].replaceAll("\"", "");
 
-					if (nomeColunaAtual.equals(colunaChave)){ //caso chave
-						indiceChave = i;
-						continue;
-					}
-
-					int indiceColuna = colunasRelevantes.indexOf(nomeColunaAtual);
-					if (indiceColuna != -1){
-						colunasValidas.set(indiceColuna, i);
-					}
-				}
+			if (nomeColunaAtual.equals(colunaChave)){ //caso chave
+				indiceChave = i;
+				continue;
 			}
-			else{
-				//TODO pensar em algo melhor do que essa remocao de aspas
-				String chave = campos[indiceChave].replaceAll("\"",""); 
-				chave = chave.substring(0, 9); //TODO substring gambiarra, pensar numa solucao melhor
 
-				Elemento e = new Elemento(chave, colunasRelevantes, tipoColunas);
-				int contador = 0;
-				for (int i: colunasValidas){
-					e.addElemento(contador, campos[i].replaceAll("\"", ""));
-					contador++;
-				}
-				resultado.put(chave, e);
-
+			int indiceColuna = colunasRelevantes.indexOf(nomeColunaAtual);
+			if (indiceColuna != -1){
+				colunasValidas.set(indiceColuna, i);
 			}
-			//Log Tempo
-			numeroLinhaAtual++;
-			if (numeroLinhaAtual% 10000 == 0 ){
-				AnalisePerformace.capturaTempo(numeroLinhaAtual);
-			}
-			
 		}
+
+		br.lines().parallel().forEach( (String linha) -> {
+			String campos[] = linha.split(delimitador);//TODO pensar em algo melhor
+			
+			//TODO pensar em algo melhor do que essa remocao de aspas
+			String chave = campos[indiceChave].replaceAll("\"",""); 
+			chave = chave.substring(0, 9); //TODO substring gambiarra, pensar numa solucao melhor
+
+			Elemento e = new Elemento(chave, colunasRelevantes, tipoColunas);
+			int contador = 0;
+			for (int i: colunasValidas){
+				e.addElemento(contador, campos[i].replaceAll("\"", ""));
+				contador++;
+			}
+			resultado.put(chave, e);
+
+		});
+		
+		//Log Tempo
+		AnalisePerformace.capturaTempo(resultado.size());
 		AnalisePerformace.imprimeEstatistica("Lendo " + arqCsv);
 		br.close();
 		return resultado;
 	}
+
 }

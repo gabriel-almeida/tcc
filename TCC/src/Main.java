@@ -1,10 +1,13 @@
 import java.io.IOException;
+import java.util.List;
 
 import modelo.ConjuntoDados;
+import modelo.Elemento;
 import processamento.PreProcessamento;
 import supervisao.Supervisao;
 import supervisao.SupervisaoArquivo;
 import supervisao.SupervisaoHumana;
+import utilidades.Constantes;
 import aprendizado.Regressao;
 import aprendizado.RegressaoLinear;
 import aprendizado.RegressaoLogistica;
@@ -15,6 +18,7 @@ import entrada_saida.AmostragemAleatoria;
 import entrada_saida.ArquivoConfiguracao;
 import entrada_saida.EntradaCSV;
 import entrada_saida.GerenciadorBases;
+import entrada_saida.SaidaCSV;
 import entrada_saida.SerializacaoRegressao;
 import extracaoFeatures.ExtratorFeatures;
 import extracaoFeatures.IgualdadeNome;
@@ -71,9 +75,10 @@ public class Main {
 			PreProcessamento preprocessamento = config.getPreprocessamento();
 			ExtratorFeatures extratorFeatures = new ExtratorFeatures(preprocessamento);
 
-			IgualdadeNome igualdade = new IgualdadeNome();
+			IgualdadeNome igualdade = new IgualdadeNome(); //TODO pegar do arq configuracao
 			GerenciadorBases gerenciador = new GerenciadorBases(entradaBase1, entradaBase2, igualdade, extratorFeatures);
-			gerenciador.pareiaBasesComChave();
+			gerenciador.pareiaBasesParalelo();
+			
 			if (!apenasMatching){
 				Supervisao sup;
 				if (supervisaoHumana || entradaResposta == null){
@@ -85,13 +90,19 @@ public class Main {
 				}
 
 				ConjuntoDados conjDados = sup.geraConjuntoTreino();
-				System.out.println(conjDados.getIndiceRespostasExistentes().size() + " respostas");
+				System.out.println(conjDados.getIndiceRespostasExistentes().size() + " respostas existentes no treino.");
 				
-				analiseAlgoritmo(new RegressaoZeroR(), conjDados);
-				analiseAlgoritmo(new RegressaoLinear(), conjDados);
-				analiseAlgoritmo(new RegressaoLogistica(), conjDados);
-				//geraGrafico(a, 0.01);
-
+				Regressao regressao = new RegressaoLogistica();
+				ValidacaoCruzada vc = new ValidacaoCruzada(regressao, conjDados, porcentagemTeste);
+				Avaliador a = vc.avalia();
+				a.avalia(Constantes.LimiarPadrao);
+				System.out.println(a);
+				
+				List<Elemento> baseClassificada = gerenciador.classificaBase(regressao, Constantes.LimiarPadrao, Constantes.nomeColunaClassificacao);
+				SaidaCSV saida = config.getCSVClassificao();
+				saida.salva(baseClassificada);
+				
+				geraGrafico(a, 0.01);
 				//sr.salvaPesos(regressao, config.getArquivoRegressao());
 			}
 			else{
@@ -112,12 +123,12 @@ public class Main {
 		System.out.println(a);
 		
 	}
-	static String separador = ";";
+	static String separador = "\t";
 	static void geraGrafico(Avaliador a, double passo){
-		System.out.println("Precisao"+separador+"Recall"+separador+"F1");
+		System.out.println("Limiar"+separador+"Precisao"+separador+"Recall"+separador+"F1");
 		for (double i = 0.0; i <= 1; i += passo){
 			a.avalia(i);
-			System.out.println(a.precisaoPositiva() + separador + a.recallPositiva() + separador + a.f1MeasurePositiva());
+			System.out.println(i + separador + a.precisaoPositiva() + separador + a.recallPositiva() + separador + a.f1MeasurePositiva());
 		}
 	}
 }

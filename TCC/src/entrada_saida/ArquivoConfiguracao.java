@@ -156,6 +156,9 @@ public class ArquivoConfiguracao {
 			return new EntradaCSV(arqRespostas, colunasResposta, tipoDadosResposta, colunaChaveRespostas);
 		}
 	}
+	public SaidaCSV getCSVClassificao(){
+		return new SaidaCSV(arqSaida, colunaChaveRespostas); //TODO capturar isso do arquivo de configuracao
+	}
 	public PreProcessamento getPreprocessamento(){
 		PreProcessamento processamento = new PreProcessamento();
 		Processador p = new ProcessadorNome(this.tabelaSubstituicaoNomes, this.stopwordsNomes);

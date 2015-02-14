@@ -1,12 +1,13 @@
 package modelo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ConjuntoDados {
-	List<ArrayList<Double>> matriz = new ArrayList<ArrayList<Double>>();
+	List<ArrayList<Double>> matriz = Collections.synchronizedList(new ArrayList<ArrayList<Double>>());
 	Map<Integer, Double> respostas = new HashMap<Integer, Double>();
 
 	public void adicionaAmostra(ArrayList<Double> amostra){

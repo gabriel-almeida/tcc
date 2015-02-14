@@ -2,18 +2,18 @@ package entrada_saida;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jblas.DoubleMatrix;
-
-import utilidades.AnalisePerformace;
-import utilidades.Matriz;
-import aprendizado.RegressaoLinear;
 import modelo.ConjuntoDados;
 import modelo.Elemento;
+import utilidades.AnalisePerformace;
+import utilidades.Constantes;
+import aprendizado.Regressao;
 import extracaoFeatures.CondicaoIgualdade;
 import extracaoFeatures.ExtratorFeatures;
 
@@ -42,8 +42,8 @@ public class GerenciadorBases {
 		this.base1 = new HashMap<String, Elemento>();
 		this.base2 = new HashMap<String, Elemento>();
 		this.dataset = new ConjuntoDados();
-		this.indiceChave = new HashMap<String, Integer>();
-		this.chavesNoConjuntoDados = new ArrayList<String>();
+		this.indiceChave = Collections.synchronizedMap(new HashMap<String, Integer>());
+		this.chavesNoConjuntoDados = Collections.synchronizedList(new ArrayList<String>());
 	}
 
 	//TODO melhorar nomes
@@ -106,7 +106,38 @@ public class GerenciadorBases {
 		}
 		AnalisePerformace.imprimeEstatistica("Parendo Bases");
 	}
-	/*public Map<String, Double> classificaBase(RegressaoLinear r){
+	
+	public void pareiaBasesParalelo() throws IOException{
+		this.base1 = entradaBase1.leCsv();
+		this.base2 = entradaBase2.leCsv();
+
+		Set<String> chavesBase1 = this.base1.keySet();
+		Set<String> chavesBase2 = this.base2.keySet();
+
+		chavesBase1.retainAll(chavesBase2);
+		Set<String> chavesComuns = chavesBase1; //legibilidade
+		
+		AnalisePerformace.zera();
+		AnalisePerformace.capturaTempo(0);
+		
+		chavesComuns.parallelStream().forEach((String chave) -> {
+			Elemento e1 = this.base1.get(chave); 
+			Elemento e2 = this.base2.get(chave);
+
+			boolean iguais = condicaoIgualdade.condicaoIgualdade(e1, e2);
+
+			if (!iguais){
+				ArrayList<Double> features = extrator.extrai(e1, e2);
+				this.dataset.adicionaAmostra(features);
+				this.indiceChave.put(chave, this.indiceChave.size());
+				this.chavesNoConjuntoDados.add(chave);
+			}			
+		});
+		AnalisePerformace.capturaTempo(chavesComuns.size());
+		AnalisePerformace.imprimeEstatistica("Pareamento Paralelo");
+	}
+	
+	public List<Elemento> classificaBase(Regressao r, double limiar, String nomeColunaClassificacao){
 		int tamanhoBase = this.dataset.tamanho();
 
 		//Gero lista com todos os indices
@@ -115,17 +146,22 @@ public class GerenciadorBases {
 			indices.add(i);
 		}
 		
-		DoubleMatrix matrizBase = Matriz.geraMatriz(indices, this.dataset);
-		DoubleMatrix classificacaoBase = r.classifica(matrizBase);
+		List<Double> classificacaoBase = r.classifica(this.dataset, indices);
 		
-		Map<String, Double> resultado = new HashMap<String, Double>();
+		List<Elemento> resultado = new ArrayList<Elemento>();
 		for (int i = 0; i < tamanhoBase; i++){
 			String chave = this.chavesNoConjuntoDados.get(i);
-			double classificacaoAtual = classificacaoBase.get(i,0);
-			resultado.put(chave, classificacaoAtual);
+			double classificacaoAtual = classificacaoBase.get(i);
+			
+			Elemento e = new Elemento(chave, Arrays.asList(new String[]{"Elemento1 da Base 1", "Elemento 1 da Base 2", nomeColunaClassificacao})); //TODO Melhorar o metodo de claassificacao de base
+			
+			e.addElemento(0, this.base1.get(chave).getElemento(0));
+			e.addElemento(1, this.base2.get(chave).getElemento(0));
+			e.addElemento(2, classificacaoAtual > limiar? Constantes.stringIguais: Constantes.stringDiferentes);
+			resultado.add(e);
 		}
 		return resultado;
-	}*/
+	}
 	
 	public void setResposta(String chave, double resposta){
 		Integer i = this.indiceChave.get(chave);

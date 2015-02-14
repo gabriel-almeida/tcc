@@ -27,9 +27,6 @@ public class RegressaoLinear implements Regressao {
 		DoubleMatrix testeBias = Matriz.adicionaColunaBias(matrizTeste);
 		DoubleMatrix resposta = testeBias.mmul(pesos);
 		
-		pesos.print();
-		resposta.print();
-		
 		return resposta;
 	}
 

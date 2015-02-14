@@ -16,7 +16,7 @@ public class RegressaoLogistica implements Regressao {
 	private int numPassos=100000;
 	private double epsilon= 1E-6;
 	private double normaMinima = 1E-3;
-
+	private double lambda = 0.0001; //teste de regularizacao 
 	private DoubleMatrix pesos;
 
 	public static final double maxEta=0.1;
@@ -76,7 +76,9 @@ public class RegressaoLogistica implements Regressao {
 
 			DoubleMatrix gradiente = numerador.divColumnVector(divisor); //matriz amostra x features
 			gradiente = gradiente.columnMeans();
-			this.pesos = this.pesos.add(gradiente.transpose().mul(this.eta));
+			
+			double regularizacao = 1.0 - 2.0*this.eta*lambda/pesos.rows;
+			this.pesos = this.pesos.mul(regularizacao).add(gradiente.transpose().mul(this.eta));
 			
 			double erroAtual = erro(dataset, target);
 			double normaGradiente = gradiente.norm2();
@@ -97,7 +99,7 @@ public class RegressaoLogistica implements Regressao {
 			
 			//Criterio de Parada
 			if (erroAtual <= this.epsilon || normaGradiente < this.normaMinima ){
-				//System.out.println(i + " Variacao Erro: " + Math.abs(erroAtual - erroAnterior) + " Eta: " + etaAtual + " Norma Gradiente: " + normaGradiente + " Melhor erro: " + melhorErro );
+				System.out.println(i + " Variacao Erro: " + Math.abs(erroAtual - erroAnterior) + " Eta: " + etaAtual + " Norma Gradiente: " + normaGradiente + " Melhor erro: " + melhorErro );
 				break;
 			}
 			erroAnterior = erroAtual;
