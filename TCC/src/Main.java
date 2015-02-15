@@ -96,11 +96,13 @@ public class Main {
 				Regressao regressao = new RegressaoLogistica();
 				ValidacaoCruzada vc = new ValidacaoCruzada(regressao, conjDados, porcentagemTeste);
 				TesteConfianca teste = new TesteConfianca();
-				teste.testeConfianca(30, vc);
-				System.out.println(teste.toString());
-//				Avaliador a = vc.avalia();
-//				a.avalia(Constantes.LimiarPadrao);
-//				System.out.println(a);
+//				teste.testeConfianca(30, vc);
+//				System.out.println(teste.toString());
+				Avaliador a = vc.avalia();
+				a.avalia(Constantes.LimiarPadrao);
+				System.out.println(a);
+				
+				gerenciador.desduplica(regressao);
 //				
 //				List<Elemento> baseClassificada = gerenciador.classificaBase(regressao, Constantes.LimiarPadrao, Constantes.nomeColunaClassificacao);
 //				SaidaCSV saida = config.getCSVClassificao();

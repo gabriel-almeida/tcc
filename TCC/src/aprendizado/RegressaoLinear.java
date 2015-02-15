@@ -51,8 +51,17 @@ public class RegressaoLinear implements Regressao {
 		DoubleMatrix resultado = classifica(teste);
 		return resultado.elementsAsList();
 	}
+	
+	@Override
 	public Object clone(){
 		RegressaoLinear novaRegressao = new RegressaoLinear();
 		return novaRegressao;
+	}
+	
+	@Override
+	public double classifica(List<Double> features) {
+		DoubleMatrix teste = new DoubleMatrix(features).transpose();
+		DoubleMatrix resposta = this.classifica(teste);
+		return resposta.get(0, 0);
 	}
 }

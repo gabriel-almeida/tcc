@@ -152,6 +152,12 @@ public class RegressaoLogistica implements Regressao {
 		RegressaoLogistica novaRegressao = new RegressaoLogistica(this.eta, this.numPassos, this.epsilon);
 		return novaRegressao;
 	}
+	@Override
+	public double classifica(List<Double> features) {
+		DoubleMatrix teste = new DoubleMatrix(features);
+		DoubleMatrix resposta = this.classifica(teste.transpose());
+		return resposta.get(0, 0);
+	}
 }
 
 
