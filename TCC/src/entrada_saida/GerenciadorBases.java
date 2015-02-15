@@ -84,8 +84,7 @@ public class GerenciadorBases {
 		chavesBase1.retainAll(chavesBase2);
 		Set<String> chavesComuns = chavesBase1; //legibilidade
 		
-		AnalisePerformace.zera();
-		AnalisePerformace.capturaTempo(0);
+		AnalisePerformace tempo = new AnalisePerformace();
 		
 		chavesComuns.parallelStream().forEach((String chave) -> {
 			Elemento e1 = this.base1.get(chave); 
@@ -100,22 +99,15 @@ public class GerenciadorBases {
 				this.chavesNoConjuntoDados.add(chave);
 			}			
 		});
-		AnalisePerformace.capturaTempo(chavesComuns.size());
-		AnalisePerformace.imprimeEstatistica("Pareamento Paralelo");
+		tempo.capturaTempo(chavesComuns.size());
+		tempo.imprimeEstatistica("Pareamento Paralelo");
 	}
 	
 	public void desduplica(Regressao r){
 		MetricaRegressao metrica = new MetricaRegressao(r, extrator);
 		BiFunction<Elemento, Elemento, Integer> funcao = metrica.geraFuncaoMetricaSimilaridade(30); //TODO magic
 		ArvoreBK<Elemento> arvore = new ArvoreBK<Elemento>(funcao);
-		
-		AnalisePerformace.zera();
-		AnalisePerformace.capturaTempo(0);
-		
 		arvore.adicionaElementos(this.base1.values());
-		 
-		AnalisePerformace.capturaTempo(10000);
-		AnalisePerformace.imprimeEstatistica("Insere Arvore BK");
 		
 		System.out.println("Profundidade = " + arvore.getProfundidade() + " Numero Nos = " + arvore.getNumeroNos());
 		System.out.println(arvore.media());

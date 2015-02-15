@@ -67,9 +67,9 @@ public class EntradaCSV {
 		for (int i=0; i< colunasRelevantes.size(); i++){
 			colunasValidas.add(-1);
 		}
+		
 		//LOG tempo
-		AnalisePerformace.zera();
-		AnalisePerformace.capturaTempo(0);
+		AnalisePerformace tempo = new AnalisePerformace();
 
 		//Localizo os cabecalhos relevantes e boto seus indices na ordem da lista de nomes
 		String cabecalho[] = br.readLine().split(delimitador);
@@ -105,8 +105,9 @@ public class EntradaCSV {
 		});
 		
 		//Log Tempo
-		AnalisePerformace.capturaTempo(resultado.size());
-		AnalisePerformace.imprimeEstatistica("Lendo " + arqCsv);
+		tempo.capturaTempo(resultado.size());
+		tempo.imprimeEstatistica("Lendo " + arqCsv);
+		
 		br.close();
 		return resultado;
 	}

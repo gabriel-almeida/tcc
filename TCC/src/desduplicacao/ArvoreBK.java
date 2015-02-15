@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
+import utilidades.AnalisePerformace;
+
 public class ArvoreBK<T> {
 	private Node<T> raiz;
 	private BiFunction<T, T, Integer> metrica;
@@ -77,10 +79,17 @@ public class ArvoreBK<T> {
 	private double media;
 	public double media(){
 		media = 0.0;
+		AnalisePerformace tempo = new AnalisePerformace();
+		
 		transversal(node -> media += node.getChaves().size(), raiz);
+		
+		tempo.capturaTempo(getNumeroNos());
+		tempo.imprimeEstatistica("Transversal Arvore B");
+		
 		return media/numeroNos;
 	}
 	private void transversal(Consumer<Node<T>> funcao, Node<T> elemento){
+		
 		for (int i: elemento.getChaves()){
 			funcao.accept(elemento);
 			transversal(funcao, elemento.getFilho(i));
@@ -119,6 +128,9 @@ public class ArvoreBK<T> {
 	 * Retorna a profundidade maxima obtida durante a insercao
 	 * */
 	public void adicionaElementos (Collection<T> novos){
+		//Log Tempo
+		AnalisePerformace tempo = new AnalisePerformace();
+		
 		int haRaiz = 0;
 		if (raiz == null){
 			haRaiz = 1;
@@ -127,21 +139,16 @@ public class ArvoreBK<T> {
 		novos.stream().limit(haRaiz).forEach(e -> raiz = new Node<T>(e));		
 		int profundidadeAtual = novos.stream().skip(haRaiz).parallel().mapToInt( e -> this.adicionaElementoParalelo(e)).max().orElse(0);
 		this.profundidade = Math.max(profundidadeAtual, profundidade);
+		
+		//LOG tempo
+		tempo.capturaTempo(novos.size());
+		tempo.imprimeEstatistica("Insersao arvore BK");
 	}
 	private int adicionaElementoParalelo(T novoElemento)
 	{	
 		Node<T> noAtual = raiz;
 		int profundidade = 0;
 		while(true){
-//			if (this.metrica == null){
-//				System.out.println("metrica");
-//			}
-//			if (noAtual== null){
-//				System.out.println("noAtual");
-//			}
-//			if (novoElemento == null){
-//				System.out.println("novo");
-//			}
 			int dist = this.metrica.apply(noAtual.getElemento(), novoElemento);
 			synchronized (noAtual) {
 				if ( !noAtual.temFilho(dist) ){

@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AnalisePerformace {
-	private static List<Integer> contador = new ArrayList<Integer>();
-	private static List<Long> tempo = new ArrayList<Long>();
-	public static void capturaTempo(int contadorAtual){
+	private List<Integer> contador = new ArrayList<Integer>();
+	private List<Long> tempo = new ArrayList<Long>();
+	public AnalisePerformace(){
+		capturaTempo(0);
+	}
+	public void capturaTempo(int contadorAtual){
 		tempo.add(System.currentTimeMillis());
 		contador.add(contadorAtual);
 	}
-	public static void imprimeEstatistica(String operacao){
+	public void imprimeEstatistica(String operacao){
 		//int ultimoIndice = tempo.size() - 1;
 		double media = 0.0;
 		double pior = Double.MAX_VALUE;
@@ -58,7 +61,7 @@ public class AnalisePerformace {
 		return Math.round(conversao) + " " + unidade;
 	}
 	
-	public static void zera(){
+	public void zera(){
 		contador.clear();
 		tempo.clear();
 	}

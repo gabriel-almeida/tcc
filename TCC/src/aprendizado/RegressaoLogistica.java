@@ -60,8 +60,7 @@ public class RegressaoLogistica implements Regressao {
 		DoubleMatrix melhoresPesos = null;
 		
 		//LOG Tempo
-		AnalisePerformace.zera();
-		AnalisePerformace.capturaTempo(0);
+		AnalisePerformace tempo = new AnalisePerformace();
 		
 		//Iteracao principal
 		for (int i = 0; i< numPassos; i++ ){
@@ -106,11 +105,11 @@ public class RegressaoLogistica implements Regressao {
 			
 			//LOG Tempo
 			if (i % 10000 == 0){
-				AnalisePerformace.capturaTempo(i);
+				tempo.capturaTempo(i);
 			}
 		}
 		this.pesos = melhoresPesos;
-		AnalisePerformace.imprimeEstatistica("Regressao Logistica");
+		tempo.imprimeEstatistica("Regressao Logistica");
 	}
 	/**
 	 * Retorna o resultado da regressao de cada amostra numa linha em um vetor coluna

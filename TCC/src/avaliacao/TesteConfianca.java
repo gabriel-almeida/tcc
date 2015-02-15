@@ -14,17 +14,19 @@ public class TesteConfianca {
 	public static final double coef = 1.96;
 
 	public void testeConfianca(int numTestes, ValidacaoCruzada validacao){
-		AnalisePerformace.zera();
-		AnalisePerformace.capturaTempo(0);
+		AnalisePerformace tempo = new AnalisePerformace();
+		
 		resultados = IntStream.range(0, numTestes).parallel().mapToObj(i-> {
 			ValidacaoCruzada novaValidacao = (ValidacaoCruzada) validacao.clone();
 			Avaliador a = novaValidacao.avalia();
 			a.avalia(Constantes.LimiarPadrao);
 			return a;
 		}).collect(Collectors.toList());
-		AnalisePerformace.capturaTempo(numTestes);
-		AnalisePerformace.imprimeEstatistica("Teste de Confianca");
+		
+		tempo.capturaTempo(numTestes);
+		tempo.imprimeEstatistica("Teste de Confianca");
 	}
+
 
 	/**
 	 * Retorna a media e o intervalo de confianca com 95% de uma dada metrica da classe Avaliador
