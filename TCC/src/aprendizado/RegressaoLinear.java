@@ -51,4 +51,8 @@ public class RegressaoLinear implements Regressao {
 		DoubleMatrix resultado = classifica(teste);
 		return resultado.elementsAsList();
 	}
+	public Object clone(){
+		RegressaoLinear novaRegressao = new RegressaoLinear();
+		return novaRegressao;
+	}
 }

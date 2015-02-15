@@ -20,5 +20,10 @@ public class RegressaoZeroR implements Regressao {
 			List<Integer> indicesTeste) {
 		return new ArrayList<Double>(Collections.nCopies(indicesTeste.size(), resposta));
 	}
-
+	@Override
+	public Object clone(){
+		RegressaoZeroR novaRegressao = new RegressaoZeroR();
+		novaRegressao.resposta = this.resposta;
+		return novaRegressao;
+	}
 }

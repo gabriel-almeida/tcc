@@ -15,8 +15,8 @@ public class RegressaoLogistica implements Regressao {
 	private double eta=0.01;
 	private int numPassos=100000;
 	private double epsilon= 1E-6;
-	private double normaMinima = 1E-3;
-	private double lambda = 0.0001; //teste de regularizacao 
+	private double normaMinima = 1E-3; //TODO rever esses parametros de treino
+	private double lambda = 0.0; //teste de regularizacao 
 	private DoubleMatrix pesos;
 
 	public static final double maxEta=0.1;
@@ -146,6 +146,11 @@ public class RegressaoLogistica implements Regressao {
 		DoubleMatrix teste = Matriz.geraMatriz(indicesTeste, conjDados);
 		DoubleMatrix resultado = classifica(teste);
 		return resultado.elementsAsList();
+	}
+	@Override
+	public Object clone(){
+		RegressaoLogistica novaRegressao = new RegressaoLogistica(this.eta, this.numPassos, this.epsilon);
+		return novaRegressao;
 	}
 }
 

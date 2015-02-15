@@ -13,6 +13,7 @@ import aprendizado.RegressaoLinear;
 import aprendizado.RegressaoLogistica;
 import aprendizado.RegressaoZeroR;
 import avaliacao.Avaliador;
+import avaliacao.TesteConfianca;
 import avaliacao.ValidacaoCruzada;
 import entrada_saida.AmostragemAleatoria;
 import entrada_saida.ArquivoConfiguracao;
@@ -94,15 +95,18 @@ public class Main {
 				
 				Regressao regressao = new RegressaoLogistica();
 				ValidacaoCruzada vc = new ValidacaoCruzada(regressao, conjDados, porcentagemTeste);
-				Avaliador a = vc.avalia();
-				a.avalia(Constantes.LimiarPadrao);
-				System.out.println(a);
-				
-				List<Elemento> baseClassificada = gerenciador.classificaBase(regressao, Constantes.LimiarPadrao, Constantes.nomeColunaClassificacao);
-				SaidaCSV saida = config.getCSVClassificao();
-				saida.salva(baseClassificada);
-				
-				geraGrafico(a, 0.01);
+				TesteConfianca teste = new TesteConfianca();
+				teste.testeConfianca(30, vc);
+				System.out.println(teste.toString());
+//				Avaliador a = vc.avalia();
+//				a.avalia(Constantes.LimiarPadrao);
+//				System.out.println(a);
+//				
+//				List<Elemento> baseClassificada = gerenciador.classificaBase(regressao, Constantes.LimiarPadrao, Constantes.nomeColunaClassificacao);
+//				SaidaCSV saida = config.getCSVClassificao();
+//				saida.salva(baseClassificada);
+//				
+//				geraGrafico(a, 0.01);
 				//sr.salvaPesos(regressao, config.getArquivoRegressao());
 			}
 			else{

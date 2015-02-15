@@ -2,7 +2,9 @@ package avaliacao;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import modelo.ConjuntoDados;
 import aprendizado.Regressao;
@@ -14,10 +16,21 @@ public class ValidacaoCruzada {
 	private List<Integer> indicesTeste;
 	private double porcentagemTeste;
 	
+	//TODO: pensar em como paralelizar
 	public ValidacaoCruzada(Regressao regressao, ConjuntoDados conjDados, double porcentagemTeste) {
 		this.regressao = regressao;
 		this.conjDados = conjDados;
 		this.porcentagemTeste = porcentagemTeste;
+	}
+	/**
+	 * Retorna uma outra versao dessa validacao cruzada. 
+	 * O intuito inicial desse metodo eh ser usado em chamadas paralelas pela classe TesteConfianca, 
+	 *  entao o objeto ConjuntoDados nao eh clonado (apenas referenciado), mas o objeto Regressao sim.
+	 * */
+	@Override
+	public Object clone(){
+		Regressao novaRegressao = (Regressao) regressao.clone();
+		return new ValidacaoCruzada(novaRegressao, conjDados, porcentagemTeste);
 	}
 	/**
 	 * Inicializa estruturas necessaria para avaliacao, 
