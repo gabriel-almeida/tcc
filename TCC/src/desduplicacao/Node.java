@@ -1,21 +1,18 @@
 package desduplicacao;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-import modelo.Elemento;
-
-public class Node {
-	private Elemento elemento;
-	private Map<Integer, Node> filhos;
-	public Node(Elemento elemento) {
+public class Node <T>{
+	private T elemento;
+	private Map<Integer, Node<T>> filhos;
+	public Node(T elemento) {
 		this.elemento = elemento;
-		this.filhos = new ConcurrentHashMap<Integer, Node>();
+		this.filhos =  new HashMap<Integer, Node<T>>();
 	}
 
-	public Elemento getElemento() {
+	public T getElemento() {
 		return elemento;
 	}
 
@@ -23,16 +20,16 @@ public class Node {
 		return filhos.containsKey(dist);
 	}
 
-	public Node getFilho(int dist) {
+	public Node<T> getFilho(int dist) {
 		return filhos.get(dist);
 	}
 
-	public void adicionaFilho(int dist, Elemento novoElemento) {
-		this.filhos.put(dist, new Node(novoElemento));
+	public void adicionaFilho(int dist, T novoElemento) {
+		this.filhos.put(dist, new Node<T>(novoElemento));
 	}
 
-	public List<Integer> getChaves() {
-		return new ArrayList<Integer>(filhos.keySet());
+	public Collection<Integer> getChaves() {
+		return filhos.keySet();
 	}
 	public String toString(){
 		return this.elemento.toString();

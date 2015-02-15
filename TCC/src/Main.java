@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 
 import modelo.ConjuntoDados;
 import modelo.Elemento;
@@ -26,7 +27,7 @@ import extracaoFeatures.IgualdadeNome;
 
 public class Main {
 	public static String arqConfiguracao = "configuracao.txt";
-	public static double porcentagemTeste = 0.30;
+	public static double porcentagemTeste = 0.0;
 	public static final String parametroPorcentagemTeste = "-teste";
 	public static final String parametroArquivoConfiguracao = "-configuracao";
 	public static final String parametroSupervisaoHumana = "-supervisao-humana";
@@ -94,8 +95,11 @@ public class Main {
 				System.out.println(conjDados.getIndiceRespostasExistentes().size() + " respostas existentes no treino.");
 				
 				Regressao regressao = new RegressaoLogistica();
+				
 				ValidacaoCruzada vc = new ValidacaoCruzada(regressao, conjDados, porcentagemTeste);
-				TesteConfianca teste = new TesteConfianca();
+				vc.setRandom(new Random(1));
+				
+//				TesteConfianca teste = new TesteConfianca();
 //				teste.testeConfianca(30, vc);
 //				System.out.println(teste.toString());
 				Avaliador a = vc.avalia();

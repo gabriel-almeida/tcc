@@ -89,13 +89,18 @@ public class Elemento {
 	@Override
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
+		sb.append("{");
+		sb.append("chave=");
+		sb.append(this.chave);
+		sb.append(", ");
 		for (int i=0; i < this.tamanho(); i++){
 			String colunaAtual = this.descritores.get(i);
 			sb.append(colunaAtual);
-			sb.append(") ");
-			sb.append(this.getElemento(colunaAtual));
-			sb.append("\n");
+			sb.append("=");
+			sb.append(this.getElemento(colunaAtual).trim());
+			sb.append(", ");
 		}
+		sb.append("}");
 		return sb.toString();
 	}
 }

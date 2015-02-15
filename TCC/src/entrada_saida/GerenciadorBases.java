@@ -8,15 +8,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.function.BiFunction;
 
-import desduplicacao.ArvoreBK;
 import modelo.ConjuntoDados;
 import modelo.Elemento;
 import utilidades.AnalisePerformace;
 import utilidades.Constantes;
 import aprendizado.MetricaRegressao;
 import aprendizado.Regressao;
+import desduplicacao.ArvoreBK;
 import extracaoFeatures.CondicaoIgualdade;
 import extracaoFeatures.ExtratorFeatures;
 
@@ -106,14 +106,28 @@ public class GerenciadorBases {
 	
 	public void desduplica(Regressao r){
 		MetricaRegressao metrica = new MetricaRegressao(r, extrator);
-		ArvoreBK arvore = new ArvoreBK(metrica, 10);
+		BiFunction<Elemento, Elemento, Integer> funcao = metrica.geraFuncaoMetricaSimilaridade(30); //TODO magic
+		ArvoreBK<Elemento> arvore = new ArvoreBK<Elemento>(funcao);
 		
 		AnalisePerformace.zera();
-		this.base1.values().stream().limit(1000).forEach(e -> arvore.adicionaElemento(e));
+		AnalisePerformace.capturaTempo(0);
 		
-		List<List<Elemento>> a = this.base1.values().stream().limit(700).parallel().map(e -> arvore.busca(e, 1)).filter(lista -> lista.size() > 1).collect(Collectors.toList());
+		arvore.adicionaElementos(this.base1.values());
+		 
+		AnalisePerformace.capturaTempo(10000);
+		AnalisePerformace.imprimeEstatistica("Insere Arvore BK");
+		
+		System.out.println("Profundidade = " + arvore.getProfundidade() + " Numero Nos = " + arvore.getNumeroNos());
+		System.out.println(arvore.media());
+		
+		/*AnalisePerformace.zera();
+		AnalisePerformace.capturaTempo(0);
+		List<List<Elemento>> a = this.base1.values().stream().parallel().map(e -> arvore.busca(e, 0)).filter(lista -> lista.size() > 1).collect(Collectors.toList());
+		AnalisePerformace.capturaTempo(1000000);
+		AnalisePerformace.imprimeEstatistica("Busca Arvore BK");
+		
 		System.out.println(a.size() );
-		System.out.println(a);
+		System.out.println(a);*/
 	}
 	
 	public List<Elemento> classificaBase(Regressao r, double limiar, String nomeColunaClassificacao){

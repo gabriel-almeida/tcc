@@ -2,9 +2,8 @@ package avaliacao;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Random;
 
 import modelo.ConjuntoDados;
 import aprendizado.Regressao;
@@ -15,12 +14,17 @@ public class ValidacaoCruzada {
 	private List<Integer> indicesTreino;
 	private List<Integer> indicesTeste;
 	private double porcentagemTeste;
-	
-	//TODO: pensar em como paralelizar
+	private Random rand;
+
 	public ValidacaoCruzada(Regressao regressao, ConjuntoDados conjDados, double porcentagemTeste) {
 		this.regressao = regressao;
 		this.conjDados = conjDados;
 		this.porcentagemTeste = porcentagemTeste;
+
+		this.rand = new Random(); //TODO cuidado na paralelizacao
+	}
+	public void setRandom(Random rand){
+		this.rand = rand;
 	}
 	/**
 	 * Retorna uma outra versao dessa validacao cruzada. 
@@ -30,7 +34,8 @@ public class ValidacaoCruzada {
 	@Override
 	public Object clone(){
 		Regressao novaRegressao = (Regressao) regressao.clone();
-		return new ValidacaoCruzada(novaRegressao, conjDados, porcentagemTeste);
+		ValidacaoCruzada clone = new ValidacaoCruzada(novaRegressao, conjDados, porcentagemTeste);
+		return clone;
 	}
 	/**
 	 * Inicializa estruturas necessaria para avaliacao, 
@@ -39,16 +44,16 @@ public class ValidacaoCruzada {
 	private void init(){
 		this.indicesTeste = new ArrayList<Integer>();
 		this.indicesTreino = conjDados.getIndiceRespostasExistentes();
-		
+
 		int tamanhoDataset = this.indicesTreino.size();
 		int tamanhoTeste = (int) Math.round( tamanhoDataset * porcentagemTeste);
-		
-		Collections.shuffle(indicesTreino);
-		
+
+		Collections.shuffle(indicesTreino, rand);
+
 		for (int i=0; i < tamanhoTeste; i++){
 			int indice = this.indicesTreino.get(0);
 			this.indicesTreino.remove(0); //equivalente a um .pop()
-			
+
 			this.indicesTeste.add(indice);
 		}
 	}
@@ -60,9 +65,17 @@ public class ValidacaoCruzada {
 	 * */
 	public Avaliador avalia(){
 		init();
+		List<Double> recebido, esperado;  
 		regressao.treina(conjDados, indicesTreino);
-		List<Double> recebido  = regressao.classifica(conjDados, indicesTeste);
-		List<Double> esperado = conjDados.geraListaResposta(indicesTeste); 
+		
+		if (this.indicesTeste.size() == 0){
+			recebido  = regressao.classifica(conjDados, indicesTreino);
+			esperado = conjDados.geraListaResposta(indicesTreino); 
+		}
+		else{
+			recebido  = regressao.classifica(conjDados, indicesTeste);
+			esperado = conjDados.geraListaResposta(indicesTeste); 
+		}
 		
 		return new Avaliador(esperado, recebido);
 	}
