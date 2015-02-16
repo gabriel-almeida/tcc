@@ -15,14 +15,6 @@ public class ExtratorFeatures {
 	public ExtratorFeatures(PreProcessamento pp){
 		this.pp = pp;
 		this.extratorPorTipo = new HashMap<String, Extrator>();
-		
-		//Setup padrao do extrator
-		Extrator extratorNome = new ExtratorMetricasSimilaridade();
-		Extrator extratorData= new ExtratorData();
-		Extrator extratorString= new ExtratorJaroWinkler();
-		setExtratorPorTipo("string", extratorNome);
-		setExtratorPorTipo("nome", extratorNome);
-		setExtratorPorTipo("data", extratorData);
 	}
 	public void setExtratorPorTipo(String tipo, Extrator extrator){
 		extratorPorTipo.put(tipo, extrator);

@@ -6,16 +6,18 @@ arquivoBase2		PessoasFisicasRFB.csv
 colunaChaveBase1	nu_basico_cpf_cgc
 colunaChaveBase2	cpf
 
-arquivoSaida saida.csv
-arquivoRegressao pesos.csv
+tamanhoMaximoChave	9
+
+arquivoSaidaMatching saida.csv
+arquivoSaidaRegressao pesos.csv
+arquivoSaidaDuplicatas	duplicatas.csv
 
 #Especifica o tipo de dado esperados em cada coluna e o descritor e cada uma das bases. Necessario pelo menos um.
 #formato: coluna tipoDado descritorBase1 descritorBase2
 
-coluna				nome		no_resp				nome
-coluna				string		no_mae_resp			nome_mae
-coluna				data		da_nascimento_resp	data_nascimento
-
+parear				nome		no_resp				nome
+parear				nome		no_mae_resp			nome_mae
+parear				data		da_nascimento_resp	data_nascimento
 
 arquivoResposta resultadoVotacao.csv
 colunaChaveResposta	ID
@@ -24,10 +26,22 @@ colunaChaveResposta	ID
 respostaPositiva	VotosPositivos
 respostaNegativa	VotosNegativos
 
-#Especifica as stopwords que serao usadas no preprocessamento de dados do tipo nome
-stopwordsNome		de da das do dos senhor doutor
 
-#Especifica as abreviacoes que serao expandidas no preprocessamento de dados do tipo nome
-abreviacaoNome		jr	junior
-abreviacaoNome		sr	senhor
-abreviacaoNome		dr	doutor
+tamanhoMaximo		data		8
+
+#Especifica as abreviacoes que serao expandidas no preprocessamento de dados do tipo de campo
+subst 				nome		jr	junior
+subst				nome		sr	senhor
+subst				nome		dr	doutor
+
+#Especifica as stopwords que serao usadas no preprocessamento de dados de um tipo de campo
+stopwords			nome		de da das do dos senhor doutor
+stopwords			data		00021130 19700101
+
+#Especifica uma expressao regular que sera usada para remover caracteres indesejados. Expressao Regular deve estar entre aspas.
+regexpRemocao		nome		"[^a-z ]"
+regexpRemocao		data		"[^0-9]"
+
+#Especifica qual tipo de extrator de features deve ser usado para cada tipo de dado
+extrator			nome		MetricasSimilaridade
+extrator			data		Binario

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 
 import modelo.ConjuntoDados;
 import modelo.Elemento;
@@ -17,13 +18,12 @@ import utilidades.Constantes;
 import aprendizado.MetricaRegressao;
 import aprendizado.Regressao;
 import desduplicacao.ArvoreBK;
-import extracaoFeatures.CondicaoIgualdade;
 import extracaoFeatures.ExtratorFeatures;
 
 public class GerenciadorBases {
 	private EntradaCSV entradaBase1;
 	private EntradaCSV entradaBase2;
-	private CondicaoIgualdade condicaoIgualdade;
+	private BiPredicate<Elemento, Elemento> condicaoIgualdade;
 	private ExtratorFeatures extrator;
 
 	//TODO talvez tres hashmaps sejam muito custosos
@@ -34,7 +34,7 @@ public class GerenciadorBases {
 	private ConjuntoDados dataset;
 	
 	public GerenciadorBases(EntradaCSV entradaBase1, EntradaCSV entradaBase2,
-			CondicaoIgualdade condicaoIgualdade, ExtratorFeatures extrator) {
+			BiPredicate<Elemento, Elemento> condicaoIgualdade, ExtratorFeatures extrator) {
 		super();
 		this.entradaBase1 = entradaBase1;
 		this.entradaBase2 = entradaBase2;
@@ -77,7 +77,7 @@ public class GerenciadorBases {
 	public void pareiaBasesParalelo() throws IOException{
 		this.base1 = entradaBase1.leCsv();
 		this.base2 = entradaBase2.leCsv();
-
+		
 		Set<String> chavesBase1 = this.base1.keySet();
 		Set<String> chavesBase2 = this.base2.keySet();
 
@@ -90,7 +90,7 @@ public class GerenciadorBases {
 			Elemento e1 = this.base1.get(chave); 
 			Elemento e2 = this.base2.get(chave);
 
-			boolean iguais = condicaoIgualdade.condicaoIgualdade(e1, e2);
+			boolean iguais = condicaoIgualdade.test(e1, e2);
 
 			if (!iguais){
 				ArrayList<Double> features = extrator.extrai(e1, e2);

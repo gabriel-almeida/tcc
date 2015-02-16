@@ -12,14 +12,14 @@ import java.util.stream.Collectors;
 
 import modelo.Elemento;
 import utilidades.AnalisePerformace;
+import utilidades.Constantes;
 
 public class EntradaCSV {
-	private static int tamMaxChave = 9;
-
-	private String delimitador = "\";\"";
+	private String delimitador = Constantes.DELIMITADOR_CAMPOS;
 	private List<String> colunasRelevantes;
 	private List<String> tipoColunas;
 	private String arqCsv;
+	private int tamMaxChave;
 
 	private String colunaChave;
 	private int indiceChave;
@@ -35,13 +35,14 @@ public class EntradaCSV {
 		}
 	}
 
-	public String getDelimitador() {
-		return delimitador;
-	}
 	public void setDelimitador(String delimitador) {
 		this.delimitador = delimitador;
 	}
-
+	
+	public void setTamMaxChave(int tamMaxChave) {
+		this.tamMaxChave = tamMaxChave;
+	}
+	
 	public List<String> getColunasRelevantes() {
 		return colunasRelevantes;
 	}
@@ -91,7 +92,11 @@ public class EntradaCSV {
 	private Elemento parseiaLinha(String linha){
 		String campos[] = linha.split(delimitador);
 
-		String chave = campos[indiceChave].replaceAll("\"","").substring(0, tamMaxChave); //TODO rever esse substring 
+		String chave = campos[indiceChave].replaceAll(Constantes.ASPAS, "");  //Geralmente aspas sao problematicas
+		if (this.tamMaxChave > 0 && chave.length() > this.tamMaxChave){
+			chave = chave.substring(0, tamMaxChave);
+		}
+		
 		Elemento e = new Elemento(chave, this.colunasRelevantes, this.tipoColunas);
 		
 		this.colunasRelevantes.stream()
@@ -101,7 +106,7 @@ public class EntradaCSV {
 	}
 	private void parseiaCabecalho(String s){
 		List<String> cabecalho = Arrays.stream(s.split(delimitador))
-				.map(campo -> campo.replaceAll("\"", ""))
+				.map(campo -> campo.replaceAll(Constantes.ASPAS, ""))
 				.collect(Collectors.toList());
 		
 		this.indiceChave = cabecalho.indexOf(this.colunaChave);

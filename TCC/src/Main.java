@@ -23,7 +23,7 @@ import entrada_saida.GerenciadorBases;
 import entrada_saida.SaidaCSV;
 import entrada_saida.SerializacaoRegressao;
 import extracaoFeatures.ExtratorFeatures;
-import extracaoFeatures.IgualdadeNome;
+import extracaoFeatures.IgualdadePrimeiroCampo;
 
 public class Main {
 	public static String arqConfiguracao = "configuracao.txt";
@@ -74,10 +74,9 @@ public class Main {
 			EntradaCSV entradaBase2 = config.getCSVBase2();
 			EntradaCSV entradaResposta = config.getCSVResposta();
 
-			PreProcessamento preprocessamento = config.getPreprocessamento();
-			ExtratorFeatures extratorFeatures = new ExtratorFeatures(preprocessamento);
+			ExtratorFeatures extratorFeatures = config.getExtrator();
 
-			IgualdadeNome igualdade = new IgualdadeNome(); //TODO pegar do arq configuracao
+			IgualdadePrimeiroCampo igualdade = new IgualdadePrimeiroCampo(); //TODO pegar do arq configuracao
 			GerenciadorBases gerenciador = new GerenciadorBases(entradaBase1, entradaBase2, igualdade, extratorFeatures);
 			gerenciador.pareiaBasesParalelo();
 			

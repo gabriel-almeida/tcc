@@ -38,7 +38,7 @@ public class AnalisePerformace {
 			//media += performace;
 		}
 		//media /= (tempo.size()-1);
-		System.out.println( "Min " + leituraHumana(pior) + " / Med " + leituraHumana(media) + " / Max " + leituraHumana(melhor)+ " operacoes por segundo | " + operacao + " em " + (tempo.get(tempo.size() - 1) - tempo.get(0))/1000.0 + " segundos.");
+		System.out.println( "Min " + leituraHumana(pior) + " / Med " + leituraHumana(media) + " / Max " + leituraHumana(melhor)+ " operacoes por segundo | " + operacao + " em " + (tempo.get(tempo.size() - 1) - tempo.get(0))/1000.0 + " segundos. | Total de " + this.contador.get(contador.size() - 1) + " operacoes.");
 		//tempo.set(tempo.size() - 1, System.currentTimeMillis()); //torna a prox medicao mais justa, removendo o tempo de execucao dessa rotina
 	}
 	
