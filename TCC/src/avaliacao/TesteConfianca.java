@@ -13,13 +13,14 @@ public class TesteConfianca {
 	public static final String formatacaoIntervaloConfianca= "%f (+- %f)";
 	public static final double coef = 1.96;
 
+	//TODO rever
 	public void testeConfianca(int numTestes, ValidacaoCruzada validacao){
 		AnalisePerformace tempo = new AnalisePerformace();
 		
 		resultados = IntStream.range(0, numTestes).parallel().mapToObj(i-> {
 			ValidacaoCruzada novaValidacao = (ValidacaoCruzada) validacao.clone();
 			Avaliador a = novaValidacao.avalia();
-			a.avalia(Constantes.LimiarPadrao);
+			a.avalia(Constantes.LIMIAR_PADRAO);
 			return a;
 		}).collect(Collectors.toList());
 		

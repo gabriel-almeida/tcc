@@ -54,7 +54,7 @@ public class Avaliador {
 	public void avalia(double limiar){
 		for (int i = 0; i < esperado.size(); i++){
 			double target = esperado.get(i);
-			double obtido = recebido.get(i) > limiar? Constantes.valorPositivo: Constantes.valorNegativo;
+			double obtido = recebido.get(i) > limiar? Constantes.VALOR_POSITIVO: Constantes.VALOR_NEGATIVO;
 
 			if (target == obtido){
 				if (obtido==1.0){

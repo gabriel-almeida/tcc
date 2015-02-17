@@ -18,8 +18,10 @@ import avaliacao.TesteConfianca;
 import avaliacao.ValidacaoCruzada;
 import entrada_saida.AmostragemAleatoria;
 import entrada_saida.ArquivoConfiguracao;
+import entrada_saida.CategorizacaoPorFaixas;
 import entrada_saida.EntradaCSV;
 import entrada_saida.GerenciadorBases;
+import entrada_saida.PreenchimentoPrimeiroCampo;
 import entrada_saida.SaidaCSV;
 import entrada_saida.SerializacaoRegressao;
 import extracaoFeatures.ExtratorFeatures;
@@ -27,14 +29,15 @@ import extracaoFeatures.IgualdadePrimeiroCampo;
 
 public class Main {
 	public static String arqConfiguracao = "configuracao.txt";
-	public static double porcentagemTeste = 0.0;
+	public static double porcentagemTeste = Constantes.PORCENTAGEM_TESTE_PADRAO;
+	public static double limiarClassificacao = Constantes.LIMIAR_PADRAO;
+	public static int repeticoesTesteConfianca = Constantes.REPETICOES_TESTE_CONFIANCA;
 	public static final String parametroPorcentagemTeste = "-teste";
 	public static final String parametroArquivoConfiguracao = "-configuracao";
 	public static final String parametroSupervisaoHumana = "-supervisao-humana";
 	public static final String parametroApenasDataMatching = "-apenas-matching";
 
 	public static double extraiPorcentagem(String s){
-
 		double d = Double.parseDouble(s);
 		if (d > 100 || d < 0){
 			throw new RuntimeException("Esperado porcentagem entre 0 e 100, recebido " + d);
@@ -42,13 +45,18 @@ public class Main {
 		return d;
 	} 
 	public static void main(String[] args) {
-		boolean supervisaoHumana = false;
-		boolean apenasMatching	= false;
+		boolean supervisaoHumana  = false;
+		boolean carregarRegressao = false; 
+		boolean supervisaoArquivo = true;
+
+		boolean matching = true;
+		boolean localizaDuplicatas = false;
+		boolean testeConfianca = false;
 
 		SerializacaoRegressao sr = new SerializacaoRegressao();
 
 		//Parseia argumentos de ARGS
-		for (int i = 0; i< args.length; i++){
+		/*for (int i = 0; i< args.length; i++){
 			String argumento = args[i];
 			if (argumento.equals(parametroPorcentagemTeste)){
 				String s = args[++i];
@@ -66,59 +74,60 @@ public class Main {
 			else {
 				throw new RuntimeException("Parametro desconhecido: " + argumento);
 			}
-		}
+		}*/
 		try {
 			ArquivoConfiguracao config = new ArquivoConfiguracao(arqConfiguracao);
 
 			EntradaCSV entradaBase1 = config.getCSVBase1();
 			EntradaCSV entradaBase2 = config.getCSVBase2();
-			EntradaCSV entradaResposta = config.getCSVResposta();
 
 			ExtratorFeatures extratorFeatures = config.getExtrator();
 
-			IgualdadePrimeiroCampo igualdade = new IgualdadePrimeiroCampo(); //TODO pegar do arq configuracao
-			GerenciadorBases gerenciador = new GerenciadorBases(entradaBase1, entradaBase2, igualdade, extratorFeatures);
+			GerenciadorBases gerenciador = new GerenciadorBases(entradaBase1, entradaBase2, Constantes.COMPARADOR_ELEMENTO_PADRAO, extratorFeatures);
 			gerenciador.pareiaBasesParalelo();
-			
-			if (!apenasMatching){
-				Supervisao sup;
-				if (supervisaoHumana || entradaResposta == null){
-					AmostragemAleatoria amostragem = new AmostragemAleatoria();
-					sup = new SupervisaoHumana(amostragem, gerenciador);
-				} 
-				else{
-					sup = new SupervisaoArquivo(gerenciador, config.getCSVResposta(), config.getVotacaoMaioria());
-				}
 
-				ConjuntoDados conjDados = sup.geraConjuntoTreino();
-				System.out.println(conjDados.getIndiceRespostasExistentes().size() + " respostas existentes no treino.");
-				
-				Regressao regressao = new RegressaoLogistica();
-				
-				ValidacaoCruzada vc = new ValidacaoCruzada(regressao, conjDados, porcentagemTeste);
-				vc.setRandom(new Random(1));
-				
-//				TesteConfianca teste = new TesteConfianca();
-//				teste.testeConfianca(30, vc);
-//				System.out.println(teste.toString());
-				Avaliador a = vc.avalia();
-				a.avalia(Constantes.LimiarPadrao);
-				System.out.println(a);
-				
-				gerenciador.desduplica(regressao);
-//				
-//				List<Elemento> baseClassificada = gerenciador.classificaBase(regressao, Constantes.LimiarPadrao, Constantes.nomeColunaClassificacao);
-//				SaidaCSV saida = config.getCSVClassificao();
-//				saida.salva(baseClassificada);
-//				
-//				geraGrafico(a, 0.01);
-				//sr.salvaPesos(regressao, config.getArquivoRegressao());
+			Supervisao sup;
+
+			if (supervisaoArquivo){
+				sup = new SupervisaoArquivo(gerenciador, config.getCSVResposta(), config.getVotacaoMaioria());
+				sup.geraConjuntoTreino();
+			}
+
+			if (supervisaoHumana){
+				AmostragemAleatoria amostragem = new AmostragemAleatoria();
+				sup = new SupervisaoHumana(amostragem, gerenciador);
+				sup.geraConjuntoTreino();
+			}
+
+			ConjuntoDados conjDados = gerenciador.getConjuntoDados();
+			System.out.println(conjDados.getIndiceRespostasExistentes().size() + " respostas existentes no treino.");
+
+			Regressao regressao = Constantes.REGRESSAO_PADRAO;
+
+			ValidacaoCruzada vc = new ValidacaoCruzada(regressao, conjDados, porcentagemTeste);
+
+			if (testeConfianca){
+				TesteConfianca teste = new TesteConfianca();
+				teste.testeConfianca(repeticoesTesteConfianca, vc);
+				System.out.println(teste.toString());
 			}
 			else{
-				RegressaoLinear regressao = sr.carregaPesos(config.getArquivoRegressao());
-
+				Avaliador a = vc.avalia();
+				a.avalia(Constantes.LIMIAR_PADRAO);
+				System.out.println(a.toString());
 			}
-			//TODO salvar base
+			if (matching){
+				List<Elemento> baseClassificada = gerenciador.classificaBase(regressao, limiarClassificacao, Constantes.PREENCHIMENTO_PADRAO, Constantes.CATEGORIZACAO_PADRAO);
+				SaidaCSV saida = config.getCSVClassificao();
+				saida.salva(baseClassificada);
+			}
+			if (localizaDuplicatas){
+				gerenciador.desduplica(regressao);
+			}
+			
+			//geraGrafico(a, 0.01);
+			//sr.salvaPesos(regressao, config.getArquivoRegressao());
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -130,7 +139,7 @@ public class Main {
 		a.avalia(0.5);
 		System.out.println();
 		System.out.println(a);
-		
+
 	}
 	static String separador = "\t";
 	static void geraGrafico(Avaliador a, double passo){

@@ -182,9 +182,9 @@ public class ArquivoConfiguracao {
 		return resposta;
 	}
 
-	/*public SaidaCSV getCSVClassificao(){
+	public SaidaCSV getCSVClassificao(){
 		return new SaidaCSV(arqSaidaMatching, colunaChaveRespostas);
-	}*/
+	}
 
 	/**
 	 * Gera um objto PreProcessamento carregado com varios objetos Processador, especificados pelo arquivo de configuracao.

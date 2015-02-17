@@ -134,7 +134,7 @@ public class RegressaoLogistica implements Regressao {
 		DoubleMatrix target = Matriz.geraVetorResposta(indices, conjDados);
 		
 		//Forca a binarizacao entre -1 e 1
-		DoubleMatrix targetsNegativos = target.eq(Constantes.valorNegativo);
+		DoubleMatrix targetsNegativos = target.eq(Constantes.VALOR_NEGATIVO);
 		target.put(targetsNegativos, -1.0);
 		
 		treino(treino, target);

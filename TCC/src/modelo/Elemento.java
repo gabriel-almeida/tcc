@@ -27,7 +27,7 @@ public class Elemento {
 	 * Considero que o tipo padrao de todas as colunas eh String
 	 * */
 	public Elemento(String chave, List<String> descritores) {
-		this(chave, descritores, Collections.nCopies(descritores.size(), "string"));
+		this(chave, descritores, new ArrayList<String>(Collections.nCopies(descritores.size(), "string")));
 	}
 
 	@Override
@@ -68,6 +68,11 @@ public class Elemento {
 
 	public int tamanho(){
 		return this.elementos.size();
+	}
+	public void adicionaColuna(String nomeColuna, String tipoColuna){
+		this.descritores.add(nomeColuna);
+		this.tiposDado.add(tipoColuna);
+		this.elementos.add(null);
 	}
 	public List<String> getDescritores(){
 		return this.descritores;

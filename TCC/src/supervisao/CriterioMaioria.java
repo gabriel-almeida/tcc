@@ -18,7 +18,7 @@ public class CriterioMaioria implements CriterioVotacao {
 	public double criterio(Elemento e) {
 		int positivo = Integer.parseInt(e.getElemento(descritorVotoPositivo));
 		int negativo = Integer.parseInt(e.getElemento(descritorVotoNegativo));
-		return positivo>negativo? Constantes.valorPositivo : Constantes.valorNegativo;
+		return positivo>negativo? Constantes.VALOR_POSITIVO : Constantes.VALOR_NEGATIVO;
 	}
 
 	@Override
