@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
+import desduplicacao.Desduplicador;
 import modelo.ConjuntoDados;
 import modelo.Elemento;
 import processamento.PreProcessamento;
@@ -9,6 +10,7 @@ import supervisao.Supervisao;
 import supervisao.SupervisaoArquivo;
 import supervisao.SupervisaoHumana;
 import utilidades.Constantes;
+import aprendizado.MetricaRegressao;
 import aprendizado.Regressao;
 import aprendizado.RegressaoLinear;
 import aprendizado.RegressaoLogistica;
@@ -32,6 +34,8 @@ public class Main {
 	public static double porcentagemTeste = Constantes.PORCENTAGEM_TESTE_PADRAO;
 	public static double limiarClassificacao = Constantes.LIMIAR_PADRAO;
 	public static int repeticoesTesteConfianca = Constantes.REPETICOES_TESTE_CONFIANCA;
+	public static double toleranciaDesduplicacao = Constantes.TOLERANCIA_PADRAO_DESDUPLICACAO;
+	
 	public static final String parametroPorcentagemTeste = "-teste";
 	public static final String parametroArquivoConfiguracao = "-configuracao";
 	public static final String parametroSupervisaoHumana = "-supervisao-humana";
@@ -49,9 +53,10 @@ public class Main {
 		boolean carregarRegressao = false; 
 		boolean supervisaoArquivo = true;
 
-		boolean matching = true;
-		boolean localizaDuplicatas = false;
+		boolean matching = false;
+		boolean localizaDuplicatas = true;
 		boolean testeConfianca = false;
+		boolean localizaEquivalencia = true;
 
 		SerializacaoRegressao sr = new SerializacaoRegressao();
 
@@ -107,8 +112,8 @@ public class Main {
 			ValidacaoCruzada vc = new ValidacaoCruzada(regressao, conjDados, porcentagemTeste);
 
 			if (testeConfianca){
-				TesteConfianca teste = new TesteConfianca();
-				teste.testeConfianca(repeticoesTesteConfianca, vc);
+				TesteConfianca teste = new TesteConfianca(repeticoesTesteConfianca, vc, limiarClassificacao);
+				teste.calculaConfianca();
 				System.out.println(teste.toString());
 			}
 			else{
@@ -121,8 +126,16 @@ public class Main {
 				SaidaCSV saida = config.getCSVClassificao();
 				saida.salva(baseClassificada);
 			}
+			
+			MetricaRegressao metrica = new MetricaRegressao(regressao, extratorFeatures);
+			Desduplicador desduplicador = new Desduplicador(gerenciador.getBase1(), metrica, toleranciaDesduplicacao); //TODO escolher base principal
+			
 			if (localizaDuplicatas){
-				gerenciador.desduplica(regressao);
+				desduplicador.localizaDuplicatasBasePrincipal();
+			}
+			
+			if (localizaEquivalencia){
+				desduplicador.localizaSimilares(gerenciador.getBase2());
 			}
 			
 			//geraGrafico(a, 0.01);
@@ -131,15 +144,6 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-	public static void analiseAlgoritmo(Regressao regressao, ConjuntoDados conjDados){
-		System.out.println(regressao.getClass().getName());
-		ValidacaoCruzada vc = new ValidacaoCruzada(regressao, conjDados, porcentagemTeste);
-		Avaliador a = vc.avalia();
-		a.avalia(0.5);
-		System.out.println();
-		System.out.println(a);
-
 	}
 	static String separador = "\t";
 	static void geraGrafico(Avaliador a, double passo){

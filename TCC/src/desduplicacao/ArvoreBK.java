@@ -3,9 +3,13 @@ package desduplicacao;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import utilidades.AnalisePerformace;
 
@@ -39,21 +43,9 @@ public class ArvoreBK<T> {
 		preOrdemF(funcao, raiz);
 	}
 	private void preOrdemF(Consumer<T> funcao, Node<T> elemento){
+		funcao.accept(elemento.getElemento());
 		for (int i: elemento.getChaves()){
-			funcao.accept(elemento.getElemento());
 			preOrdemF(funcao, elemento.getFilho(i));
-		}
-	}
-	/**
-	 * Varre a estrutura no formato "Em Ordem", executando a funcao consumidora 
-	 * */
-	public void emOrdem(Consumer<T> funcao){
-		emOrdemF(funcao, raiz);
-	}
-	private void emOrdemF(Consumer<T> funcao, Node<T> elemento){
-		for (int i: elemento.getChaves()){
-			emOrdemF(funcao, elemento.getFilho(i));
-			funcao.accept(elemento.getElemento());
 		}
 	}
 	/**
@@ -76,25 +68,56 @@ public class ArvoreBK<T> {
 		return this.numeroNos;
 	}
 	
-	private double media;
-	public double media(){
-		media = 0.0;
+	private Map<Integer, Integer> ocorrencias;
+	public Map<Integer, Integer> frequenciaUsoIndices(){
+		ocorrencias = new HashMap<Integer, Integer>();
 		AnalisePerformace tempo = new AnalisePerformace();
 		
-		transversal(node -> media += node.getChaves().size(), raiz);
+		transversal(node -> node.getChaves().stream().forEach( indice -> {
+			int quantAtual = ocorrencias.getOrDefault(indice, 0); 
+			ocorrencias.put(indice, quantAtual + 1);})
+			, raiz);
 		
 		tempo.capturaTempo(getNumeroNos());
-		tempo.imprimeEstatistica("Transversal Arvore B");
+		tempo.imprimeEstatistica("Transversal Arvore BK");
 		
-		return media/numeroNos;
+		return ocorrencias;
 	}
 	private void transversal(Consumer<Node<T>> funcao, Node<T> elemento){
-		
+		funcao.accept(elemento);
 		for (int i: elemento.getChaves()){
-			funcao.accept(elemento);
 			transversal(funcao, elemento.getFilho(i));
 		}
 	}
+	
+	public List<List<T>> possiveisDuplicatas(){
+		AnalisePerformace tempo = new AnalisePerformace();
+		
+		ArrayList<List<T>> acumuladorGlobal = new ArrayList<List<T>>();
+		possiveisDuplicatasR(raiz, acumuladorGlobal, new ArrayList<T>());
+		
+		tempo.capturaTempo(this.numeroNos);
+		tempo.imprimeEstatistica("Localizacao duplicatas sequencial");
+		
+		return acumuladorGlobal;
+	}
+	private void possiveisDuplicatasR(Node<T> raiz, List<List<T>> acumuladorGeral, List<T> acumuladorLocal){
+		acumuladorLocal.add(raiz.getElemento());
+		
+		if (!raiz.temFilho(0) && acumuladorLocal.size() > 1){ //se eh "folha"
+			acumuladorGeral.add(acumuladorLocal);
+		}
+		
+		for ( int i: raiz.getChaves() ){
+			if (i == 0){
+				possiveisDuplicatasR( raiz.getFilho(i), acumuladorGeral, acumuladorLocal );
+			}
+			else{
+				possiveisDuplicatasR( raiz.getFilho(i), acumuladorGeral, new ArrayList<T>() );
+			}
+		}
+	}
+	
 	/**
 	 * Adiciona elemento individuais na estrutura. Nao eh sincronizado
 	 * */
@@ -135,9 +158,12 @@ public class ArvoreBK<T> {
 		if (raiz == null){
 			haRaiz = 1;
 		}
-		this.numeroNos += novos.size();
 		novos.stream().limit(haRaiz).forEach(e -> raiz = new Node<T>(e));		
 		int profundidadeAtual = novos.stream().skip(haRaiz).parallel().mapToInt( e -> this.adicionaElementoParalelo(e)).max().orElse(0);
+		
+		this.numeroNos = 0;
+		preOrdem(e -> this.numeroNos++);
+		
 		this.profundidade = Math.max(profundidadeAtual, profundidade);
 		
 		//LOG tempo
@@ -164,6 +190,10 @@ public class ArvoreBK<T> {
 		return profundidade;
 	}
 	
+	public Map<T, List<T>> busca(Collection<T> collection, int margemTolerancia){
+		return collection.parallelStream().collect(
+				Collectors.toConcurrentMap( Function.identity(), e -> busca(e, margemTolerancia ))); 
+	}
 	/**
 	 * Realiza uma busca nos elementos da arvore que deve retornar 
 	 * uma lista com todos os elementos dentro da margem de tolerancia indicada. 

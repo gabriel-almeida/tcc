@@ -2,12 +2,11 @@ package entrada_saida;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -19,9 +18,7 @@ import modelo.ConjuntoDados;
 import modelo.Elemento;
 import utilidades.AnalisePerformace;
 import utilidades.Constantes;
-import aprendizado.MetricaRegressao;
 import aprendizado.Regressao;
-import desduplicacao.ArvoreBK;
 import extracaoFeatures.ExtratorFeatures;
 
 public class GerenciadorBases {
@@ -30,10 +27,10 @@ public class GerenciadorBases {
 	private BiPredicate<Elemento, Elemento> condicaoIgualdade;
 	private ExtratorFeatures extrator;
 
-	//TODO talvez tres hashmaps sejam muito custosos
 	private Map<String, Integer> indiceChave;
 	private Map<String, Elemento> base1;
 	private Map<String, Elemento> base2;
+
 	private List<String> chavesNoConjuntoDados;
 	private ConjuntoDados dataset;
 
@@ -53,7 +50,6 @@ public class GerenciadorBases {
 		this.chavesNoConjuntoDados = Collections.synchronizedList(new ArrayList<String>());
 	}
 
-	//TODO melhorar nomes
 	public Elemento getElementoConjuntoDados1(int indice){
 		String chave = this.chavesNoConjuntoDados.get(indice);
 		return base1.get(chave);
@@ -70,8 +66,13 @@ public class GerenciadorBases {
 	public ConjuntoDados getConjuntoDados(){
 		return this.dataset;
 	}
-
-
+	
+	public Collection<Elemento> getBase1(){
+		return this.base1.values();
+	}
+	public Collection<Elemento> getBase2(){
+		return this.base2.values();
+	}
 	/**
 	 * Pareio duas bases usando suas chaves como criterio, carregando o extrator de estatisticas.
 	 * Apenas elementos ditos como diferentes sao usados
@@ -107,24 +108,7 @@ public class GerenciadorBases {
 		tempo.imprimeEstatistica("Pareamento Paralelo");
 	}
 
-	public void desduplica(Regressao r){
-		MetricaRegressao metrica = new MetricaRegressao(r, extrator);
-		BiFunction<Elemento, Elemento, Integer> funcao = metrica.geraFuncaoMetricaSimilaridade(30); //TODO magic
-		ArvoreBK<Elemento> arvore = new ArvoreBK<Elemento>(funcao);
-		arvore.adicionaElementos(this.base1.values());
 
-		System.out.println("Profundidade = " + arvore.getProfundidade() + " Numero Nos = " + arvore.getNumeroNos());
-		System.out.println(arvore.media());
-
-		/*AnalisePerformace.zera();
-		AnalisePerformace.capturaTempo(0);
-		List<List<Elemento>> a = this.base1.values().stream().parallel().map(e -> arvore.busca(e, 0)).filter(lista -> lista.size() > 1).collect(Collectors.toList());
-		AnalisePerformace.capturaTempo(1000000);
-		AnalisePerformace.imprimeEstatistica("Busca Arvore BK");
-
-		System.out.println(a.size() );
-		System.out.println(a);*/
-	}
 
 	public List<Elemento> classificaBase(Regressao r, double limiar, BiFunction<Elemento, Elemento, Elemento> funcaoPreenchimento, Function<Double, String> funcaoCategorizacao){
 		int tamanhoBase = this.dataset.tamanho();
@@ -139,10 +123,10 @@ public class GerenciadorBases {
 				.mapToObj( i -> {
 					String chave = this.chavesNoConjuntoDados.get(i);
 					double classificacaoAtual = classificacaoBase.get(i);
-		
+
 					//Gero o elemento basico apartir das duas bases
 					Elemento elementoSaida = funcaoPreenchimento.apply(this.base1.get(chave), this.base2.get(chave)); 
-					
+
 					//Adiciona conteudo extra ao Elemento, relativo a classificacao 
 					elementoSaida.adicionaColuna(Constantes.NOME_COLUNA_CERTEZA_CLASSIFICACAO, Constantes.TIPO_COLUNA_CERTEZA_CLASSIFICACAO);
 					elementoSaida.addElemento(Constantes.NOME_COLUNA_CERTEZA_CLASSIFICACAO, Double.toString(classificacaoAtual));
@@ -150,14 +134,14 @@ public class GerenciadorBases {
 						elementoSaida.adicionaColuna(Constantes.NOME_COLUNA_CATEGORIA_CLASSIFICACAO, Constantes.TIPO_COLUNA_CATEGORIA_CLASSIFICACAO);
 						elementoSaida.addElemento(Constantes.NOME_COLUNA_CATEGORIA_CLASSIFICACAO, funcaoCategorizacao.apply(classificacaoAtual));
 					}
-					
+
 					return elementoSaida;
 				}).collect(Collectors.toList());
-		
+
 		//Log tempo
 		tempo.capturaTempo(resultado.size());
 		tempo.imprimeEstatistica("Classificando e gerando arquivo de saida.");
-		
+
 		return resultado;
 	}
 

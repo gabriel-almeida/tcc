@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 import modelo.Elemento;
 import aprendizado.Regressao;
-import aprendizado.RegressaoLinear;
+import aprendizado.RegressaoLogistica;
 import entrada_saida.CategorizacaoPorFaixas;
 import entrada_saida.PreenchimentoPrimeiroCampo;
 import extracaoFeatures.Extrator;
@@ -21,6 +21,7 @@ public abstract class Constantes {
 	public static final double LIMIAR_PADRAO = 0.5;
 	public static final double PORCENTAGEM_TESTE_PADRAO = 0.2;
 	public static final int REPETICOES_TESTE_CONFIANCA = 50;
+	public static final double TOLERANCIA_PADRAO_DESDUPLICACAO = 0.05;
 	public static final String STRING_IGUAIS = "IGUAIS";
 	public static final String STRING_DIFERENTES = "DIFERENTES";
 	
@@ -45,7 +46,7 @@ public abstract class Constantes {
 	public static final String TIPO_COLUNA_CATEGORIA_CLASSIFICACAO = "string";
 	
 	public static final Extrator EXTRATOR_PADRAO = new ExtratorBinario();
-	public static final Regressao REGRESSAO_PADRAO = new RegressaoLinear();
+	public static final Regressao REGRESSAO_PADRAO = new RegressaoLogistica();
 	
 	public static final String DELIMITADOR_CAMPOS = "\";\""; //";" -> mais seguro que so usar ;
 	public static final String ASPAS = "\"";

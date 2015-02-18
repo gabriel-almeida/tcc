@@ -6,28 +6,39 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import utilidades.AnalisePerformace;
-import utilidades.Constantes;
 
 public class TesteConfianca {
 	private List<Avaliador> resultados;
+	private int numTestes; 
+	private ValidacaoCruzada validacao;
+	private double limiar;
 	public static final String formatacaoIntervaloConfianca= "%f (+- %f)";
 	public static final double coef = 1.96;
 
-	//TODO rever
-	public void testeConfianca(int numTestes, ValidacaoCruzada validacao){
+	public TesteConfianca(int numTestes, ValidacaoCruzada validacao, double limiar){
+		this.validacao = validacao;
+		this.numTestes = numTestes;
+		this.limiar = limiar;
+	}
+	
+	public void setLimiar(double limiar){
+		resultados.stream().forEach( a -> a.avalia(limiar));
+	}
+	
+	public void calculaConfianca(){
 		AnalisePerformace tempo = new AnalisePerformace();
 		
 		resultados = IntStream.range(0, numTestes).parallel().mapToObj(i-> {
 			ValidacaoCruzada novaValidacao = (ValidacaoCruzada) validacao.clone();
 			Avaliador a = novaValidacao.avalia();
-			a.avalia(Constantes.LIMIAR_PADRAO);
+			a.avalia(limiar);
 			return a;
 		}).collect(Collectors.toList());
 		
 		tempo.capturaTempo(numTestes);
 		tempo.imprimeEstatistica("Teste de Confianca");
 	}
-
+	
 
 	/**
 	 * Retorna a media e o intervalo de confianca com 95% de uma dada metrica da classe Avaliador

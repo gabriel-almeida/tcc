@@ -21,7 +21,7 @@ public class ValidacaoCruzada {
 		this.conjDados = conjDados;
 		this.porcentagemTeste = porcentagemTeste;
 
-		this.rand = new Random(); //TODO cuidado na paralelizacao
+		this.rand = new Random();
 	}
 	public void setRandom(Random rand){
 		this.rand = rand;
@@ -30,6 +30,7 @@ public class ValidacaoCruzada {
 	 * Retorna uma outra versao dessa validacao cruzada. 
 	 * O intuito inicial desse metodo eh ser usado em chamadas paralelas pela classe TesteConfianca, 
 	 *  entao o objeto ConjuntoDados nao eh clonado (apenas referenciado), mas o objeto Regressao sim.
+	 *  Note que uma nova instancia de Random() eh criada
 	 * */
 	@Override
 	public Object clone(){
