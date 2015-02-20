@@ -17,11 +17,11 @@ public class ArvoreBK<T> {
 	private Node<T> raiz;
 	private BiFunction<T, T, Integer> metrica;
 	private boolean permitirDuplicata;
-	
+
 	//Estatisticas
 	private int profundidade;
 	private int numeroNos;
-	
+
 	public ArvoreBK(BiFunction<T, T, Integer> metrica){
 		this(metrica, true);
 	}
@@ -35,7 +35,7 @@ public class ArvoreBK<T> {
 		this.metrica = metrica;
 		this.permitirDuplicata = permitirDuplicata;
 	}
-	
+
 	/**
 	 * Varre a estrutura no formato "Pre Ordem", executando a funcao consumidora 
 	 * */
@@ -60,27 +60,27 @@ public class ArvoreBK<T> {
 		}
 		funcao.accept(elemento.getElemento());
 	}
-	
+
 	public int getProfundidade(){
 		return this.profundidade;
 	}
 	public int getNumeroNos(){
 		return this.numeroNos;
 	}
-	
+
 	private Map<Integer, Integer> ocorrencias;
 	public Map<Integer, Integer> frequenciaUsoIndices(){
 		ocorrencias = new HashMap<Integer, Integer>();
 		AnalisePerformace tempo = new AnalisePerformace();
-		
+
 		transversal(node -> node.getChaves().stream().forEach( indice -> {
 			int quantAtual = ocorrencias.getOrDefault(indice, 0); 
 			ocorrencias.put(indice, quantAtual + 1);})
 			, raiz);
-		
+
 		tempo.capturaTempo(getNumeroNos());
 		tempo.imprimeEstatistica("Transversal Arvore BK");
-		
+
 		return ocorrencias;
 	}
 	private void transversal(Consumer<Node<T>> funcao, Node<T> elemento){
@@ -89,35 +89,40 @@ public class ArvoreBK<T> {
 			transversal(funcao, elemento.getFilho(i));
 		}
 	}
-	
+
 	public List<List<T>> possiveisDuplicatas(){
 		AnalisePerformace tempo = new AnalisePerformace();
-		
+
 		ArrayList<List<T>> acumuladorGlobal = new ArrayList<List<T>>();
-		possiveisDuplicatasR(raiz, acumuladorGlobal, new ArrayList<T>());
-		
+		possiveisDuplicatasR(raiz, acumuladorGlobal, new ArrayList<T>(), -1);
+
 		tempo.capturaTempo(this.numeroNos);
 		tempo.imprimeEstatistica("Localizacao duplicatas sequencial");
-		
+
 		return acumuladorGlobal;
 	}
-	private void possiveisDuplicatasR(Node<T> raiz, List<List<T>> acumuladorGeral, List<T> acumuladorLocal){
+	private void possiveisDuplicatasR(Node<T> raiz, List<List<T>> acumuladorGeral, List<T> acumuladorLocal, int posicaoNoPai){
 		acumuladorLocal.add(raiz.getElemento());
-		
+
 		if (!raiz.temFilho(0) && acumuladorLocal.size() > 1){ //se eh "folha"
 			acumuladorGeral.add(acumuladorLocal);
 		}
-		
+
 		for ( int i: raiz.getChaves() ){
 			if (i == 0){
-				possiveisDuplicatasR( raiz.getFilho(i), acumuladorGeral, acumuladorLocal );
+				possiveisDuplicatasR( raiz.getFilho(i), acumuladorGeral, acumuladorLocal, i );
 			}
 			else{
-				possiveisDuplicatasR( raiz.getFilho(i), acumuladorGeral, new ArrayList<T>() );
+				ArrayList<T> novoAcumuladorLocal = new ArrayList<T>();
+				if (posicaoNoPai == 0){
+					int indiceTermino = Math.max(acumuladorLocal.size() - 1, 0);
+					novoAcumuladorLocal.addAll( acumuladorLocal.subList(0, indiceTermino) );
+				}
+				possiveisDuplicatasR( raiz.getFilho(i), acumuladorGeral, novoAcumuladorLocal, i );
 			}
 		}
 	}
-	
+
 	/**
 	 * Adiciona elemento individuais na estrutura. Nao eh sincronizado
 	 * */
@@ -142,7 +147,7 @@ public class ArvoreBK<T> {
 			profundidadeAtual++;
 		}
 		noAtual.adicionaFilho(dist,novoElemento);
-		
+
 		this.profundidade = Math.max(profundidadeAtual, this.profundidade);
 		this.numeroNos++;
 	}
@@ -153,19 +158,19 @@ public class ArvoreBK<T> {
 	public void adicionaElementos (Collection<T> novos){
 		//Log Tempo
 		AnalisePerformace tempo = new AnalisePerformace();
-		
+
 		int haRaiz = 0;
 		if (raiz == null){
 			haRaiz = 1;
 		}
 		novos.stream().limit(haRaiz).forEach(e -> raiz = new Node<T>(e));		
 		int profundidadeAtual = novos.stream().skip(haRaiz).parallel().mapToInt( e -> this.adicionaElementoParalelo(e)).max().orElse(0);
-		
+
 		this.numeroNos = 0;
 		preOrdem(e -> this.numeroNos++);
-		
+
 		this.profundidade = Math.max(profundidadeAtual, profundidade);
-		
+
 		//LOG tempo
 		tempo.capturaTempo(novos.size());
 		tempo.imprimeEstatistica("Insersao arvore BK");
@@ -189,7 +194,7 @@ public class ArvoreBK<T> {
 		}
 		return profundidade;
 	}
-	
+
 	public Map<T, List<T>> busca(Collection<T> collection, int margemTolerancia){
 		return collection.parallelStream().collect(
 				Collectors.toConcurrentMap( Function.identity(), e -> busca(e, margemTolerancia ))); 
@@ -199,7 +204,7 @@ public class ArvoreBK<T> {
 	 * uma lista com todos os elementos dentro da margem de tolerancia indicada. 
 	 * A busca eh feita de forma paralela.
 	 * */
-	
+
 	public List<T> busca(T elementoBuscado, int margemTolerancia)
 	{
 		List<T> resultado = Collections.synchronizedList(new ArrayList<T>());

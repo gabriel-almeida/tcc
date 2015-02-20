@@ -22,4 +22,8 @@ public class MetricasSimilaridade {
 	public static double Levenstein(String a, String b){
 		return l.score(a, b);
 	}
+	public static void main(String args[]){
+		System.out.println(JaroWinkler("gabrasdfel", "gabrielaaa"));
+		System.out.println(JaroWinkler("gabrielaaa", "gabrasdfel" ));
+	}
 }

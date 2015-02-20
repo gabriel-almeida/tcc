@@ -56,7 +56,7 @@ public class Main {
 		boolean matching = false;
 		boolean localizaDuplicatas = true;
 		boolean testeConfianca = false;
-		boolean localizaEquivalencia = true;
+		boolean localizaEquivalencia = false;
 
 		SerializacaoRegressao sr = new SerializacaoRegressao();
 
