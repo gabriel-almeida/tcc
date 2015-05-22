@@ -7,6 +7,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 import modelo.Elemento;
+import aprendizado.RegressaoLogistica2;
 import aprendizado.Regressao;
 import aprendizado.RegressaoLogistica;
 import entrada_saida.CategorizacaoPorFaixas;
@@ -46,7 +47,7 @@ public abstract class Constantes {
 	public static final String TIPO_COLUNA_CATEGORIA_CLASSIFICACAO = "string";
 	
 	public static final Extrator EXTRATOR_PADRAO = new ExtratorBinario();
-	public static final Regressao REGRESSAO_PADRAO = new RegressaoLogistica();
+	public static final Regressao REGRESSAO_PADRAO = new RegressaoLogistica2();
 	
 	public static final String DELIMITADOR_CAMPOS = "\";\""; //";" -> mais seguro que so usar ;
 	public static final String ASPAS = "\"";
