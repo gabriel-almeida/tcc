@@ -7,6 +7,9 @@ public abstract class ExtratorFactory {
 		} else if( nomeExtrator.equals("Binario")){
 			return new ExtratorBinario();
 		}
+		else if( nomeExtrator.equals("Levenstein")){
+			return new ExtratorLevenstein();
+		}
 		throw new RuntimeException("Extrator desconhecido: " + nomeExtrator);
 		
 	}

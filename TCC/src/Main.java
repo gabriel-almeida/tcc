@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -55,7 +56,7 @@ public class Main {
 
 		boolean matching = false;
 		boolean localizaDuplicatas = true;
-		boolean testeConfianca = false;
+		boolean testeConfianca = true;
 		boolean localizaEquivalencia = false;
 
 		SerializacaoRegressao sr = new SerializacaoRegressao();
@@ -110,17 +111,20 @@ public class Main {
 			Regressao regressao = Constantes.REGRESSAO_PADRAO;
 
 			ValidacaoCruzada vc = new ValidacaoCruzada(regressao, conjDados, porcentagemTeste);
-
+		
+			Avaliador a = vc.avalia();
+			a.avalia(Constantes.LIMIAR_PADRAO);
+			System.out.println(a.toString());
+		
 			if (testeConfianca){
 				TesteConfianca teste = new TesteConfianca(repeticoesTesteConfianca, vc, limiarClassificacao);
 				teste.calculaConfianca();
-				System.out.println(teste.toString());
+				//System.out.println(teste.toString());
+				List<Double> limiares = Arrays.asList(0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0);
+				teste.estatiticasBrutas(limiares);
 			}
-			else{
-				Avaliador a = vc.avalia();
-				a.avalia(Constantes.LIMIAR_PADRAO);
-				System.out.println(a.toString());
-			}
+			
+		
 			if (matching){
 				List<Elemento> baseClassificada = gerenciador.classificaBase(regressao, limiarClassificacao, Constantes.PREENCHIMENTO_PADRAO, Constantes.CATEGORIZACAO_PADRAO);
 				SaidaCSV saida = config.getCSVClassificao();
@@ -138,19 +142,10 @@ public class Main {
 				desduplicador.localizaSimilares(gerenciador.getBase2());
 			}
 			
-			//geraGrafico(a, 0.01);
 			//sr.salvaPesos(regressao, config.getArquivoRegressao());
 
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-	}
-	static String separador = "\t";
-	static void geraGrafico(Avaliador a, double passo){
-		System.out.println("Limiar"+separador+"Precisao"+separador+"Recall"+separador+"F1");
-		for (double i = 0.0; i <= 1; i += passo){
-			a.avalia(i);
-			System.out.println(i + separador + a.precisaoPositiva() + separador + a.recallPositiva() + separador + a.f1MeasurePositiva());
 		}
 	}
 }

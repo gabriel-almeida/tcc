@@ -15,12 +15,15 @@ public class ExtratorMetricasSimilaridade implements Extrator {
 		ArrayList<Double> resultado = new ArrayList<Double>();
 		double jw = 0.0;
 		double me = 0.0;
+		double le = 0.0;
 		if (!conteudo1.equals("") && !conteudo2.equals("")){
 			jw = MetricasSimilaridade.JaroWinkler(conteudo1, conteudo2);
-			me = MetricasSimilaridade.MongeElkan(conteudo1, conteudo2);	
+			me = MetricasSimilaridade.MongeElkan(conteudo1, conteudo2);
+			le = MetricasSimilaridade.LevensteinNormalizado(conteudo1, conteudo2);
 		}
 		resultado.add(jw);
 		resultado.add(me);
+		resultado.add(le);
 		return resultado;
 	}
 }

@@ -6,12 +6,14 @@ import utilidades.Constantes;
 
 
 public class Avaliador {
+	private static final String TABULACAO = "\t";
 	private List<Double> esperado;
 	private List<Double> recebido;
 	private int verdadeiroPositivo = 0;
 	private int verdadeiroNegativo = 0;
 	private int falsoPositivo = 0;
 	private int falsoNegativo = 0;
+	private double ultimoLimiar;
 
 	public double getVerdadeiroPositivo() {
 		return verdadeiroPositivo;
@@ -52,6 +54,8 @@ public class Avaliador {
 	}
 
 	public void avalia(double limiar){
+		this.ultimoLimiar = limiar;
+
 		for (int i = 0; i < esperado.size(); i++){
 			double target = esperado.get(i);
 			double obtido = recebido.get(i) > limiar? Constantes.VALOR_POSITIVO: Constantes.VALOR_NEGATIVO;
@@ -118,5 +122,11 @@ public class Avaliador {
 				this.f1MeasurePositiva(), this.f1MeasureNegativo(),
 				this.verdadeiroPositivo, this.verdadeiroNegativo,
 				this.falsoPositivo, this.falsoNegativo);
+	}
+	public String estatisticasPositivas(){
+		return this.ultimoLimiar + TABULACAO + this.acuracia() + TABULACAO + this.precisaoPositiva() + TABULACAO + this.recallPositiva() + TABULACAO + this.f1MeasurePositiva();
+	}
+	public String estatisticasNegativas(){
+		return this.ultimoLimiar + TABULACAO + this.acuracia() + this.precisaoNegativo() + TABULACAO + this.recallNegativo() + TABULACAO + this.f1MeasureNegativo();
 	}
 }
