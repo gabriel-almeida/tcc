@@ -1,7 +1,13 @@
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+
+import org.jblas.DoubleMatrix;
 
 import desduplicacao.Desduplicador;
 import modelo.ConjuntoDados;
@@ -11,6 +17,7 @@ import supervisao.Supervisao;
 import supervisao.SupervisaoArquivo;
 import supervisao.SupervisaoHumana;
 import utilidades.Constantes;
+import utilidades.Matriz;
 import aprendizado.MetricaRegressao;
 import aprendizado.Regressao;
 import aprendizado.RegressaoLinear;
@@ -107,12 +114,23 @@ public class Main {
 
 			ConjuntoDados conjDados = gerenciador.getConjuntoDados();
 			System.out.println(conjDados.getIndiceRespostasExistentes().size() + " respostas existentes no treino.");
-
+			
+			
+			//DUMP DAS MATRIZES
+			DoubleMatrix ds = Matriz.geraMatriz(conjDados.getIndiceRespostasExistentes(), conjDados);
+			DoubleMatrix target = Matriz.geraVetorResposta(conjDados.getIndiceRespostasExistentes(), conjDados);
+			
+			Files.write(Paths.get("./dataset.txt"), ds.toString().getBytes());
+			Files.write(Paths.get("./target.txt"), target.toString().getBytes());
+						
+			
+			//PREPARA TREINO
 			Regressao regressao = Constantes.REGRESSAO_PADRAO;
 
 			ValidacaoCruzada vc = new ValidacaoCruzada(regressao, conjDados, porcentagemTeste);
 		
 			Avaliador a = vc.avalia("Curva.png");
+			//Avaliador a = vc.avalia();
 			a.avalia(Constantes.LIMIAR_PADRAO);
 			System.out.println(a.toString());
 		

@@ -36,9 +36,9 @@ public class CurvaAprendizado {
 		JFreeChart grafico = ChartFactory.createXYLineChart("Curva de aprendizado", "Epoch", 
 			    "MSE", ds, PlotOrientation.VERTICAL, true, true, false);
 		
-		XYPlot xyPlot = grafico.getXYPlot();
+		//XYPlot xyPlot = grafico.getXYPlot();
 		//ValueAxis domainAxis = xyPlot.getDomainAxis();
-		ValueAxis rangeAxis = xyPlot.getRangeAxis();
+		//ValueAxis rangeAxis = xyPlot.getRangeAxis();
 
 		//domainAxis.setRange(0.0, 1.0);
 		//rangeAxis.setRange(0.0, 0.1);

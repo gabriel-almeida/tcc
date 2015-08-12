@@ -16,7 +16,7 @@ import utilidades.Matriz;
 
 public class RegressaoLogistica2 implements Regressao {
 	private double coeficienteAprendizado=0.001;
-	private int numPassos=100000;
+	private int numPassos=10000;
 	private double erroMinimo= 1E-6;
 	private double normaMinima = 1E-5; //TODO rever esses parametros de treino
 	private DoubleMatrix pesos;
@@ -90,7 +90,14 @@ public class RegressaoLogistica2 implements Regressao {
 			
 			//if (i > 1000) System.out.println("deu ruim.");
 			
-			this.pesos = this.pesos.add(gradiente.mul(coeficienteAprendizado));
+			
+			DoubleMatrix a = this.pesos.dup().put(this.pesos.length - 1, 0.0);
+			double norma = a.norm2();
+			/*DoubleMatrix penalidade = this.pesos.div(norma).mul(-0.01);
+			penalidade.put(penalidade.length - 1, 0.0);*/
+			
+			this.pesos = this.pesos.add(gradiente.mul(coeficienteAprendizado)).sub(norma*0.1);
+			
 			
 			double verossimilhancaAtual = funcaoVerossimilhanca(dataset, target);
 
@@ -109,14 +116,13 @@ public class RegressaoLogistica2 implements Regressao {
 				//CRITERIO DE PARADA: MELHORA DE GRADIENTE INSIGNIFICANTE
 				double melhora = Math.abs(melhorVerossimilhanca - verossimilhancaAtual);
 				if (melhora < this.normaMinima){
-					System.out.println("iteracao de parada: " + i +  " Variacao da verossimilhanca: " + melhora + " Melhor vessimilhanca: " + melhorVerossimilhanca  + " melhores pesos :" + this.pesos);
 					break;
 				}
-				this.coeficienteAprendizado = Math.min(0.1, Math.max(0.001, coeficienteAprendizado*1.1));
+				this.coeficienteAprendizado = Math.min(0.1, Math.max(0.0001, coeficienteAprendizado*1.1));
 				melhorVerossimilhanca = verossimilhancaAtual;
 			}
 			else{
-				this.coeficienteAprendizado = Math.min(0.1, Math.max(0.001, coeficienteAprendizado*0.5));
+				this.coeficienteAprendizado = Math.min(0.1, Math.max(0.0001, coeficienteAprendizado*0.5));
 				this.pesos = melhoresPesos;
 			}
 			
@@ -130,6 +136,7 @@ public class RegressaoLogistica2 implements Regressao {
 		}
 		//this.pesos = melhoresPesos;
 		tempo.capturaTempo(i);
+		System.out.println("iteracao de parada: " + i + " Melhor vessimilhanca: " + melhorVerossimilhanca  + " melhores pesos :" + this.pesos);
 		tempo.imprimeEstatistica("Regressao Logistica");
 	}
 	/**
