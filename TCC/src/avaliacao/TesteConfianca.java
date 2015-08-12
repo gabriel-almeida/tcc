@@ -1,11 +1,16 @@
 package avaliacao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import utilidades.AnalisePerformace;
+import utilidades.BoxPlot;
+import utilidades.ScatterPlot;
 
 public class TesteConfianca {
 	private List<Avaliador> resultados;
@@ -65,7 +70,33 @@ public class TesteConfianca {
 		System.out.println("Estatisticas Positivas:");
 		System.out.println(sbPositivo);
 	}
-
+	public void plota(List<Double> limiares){
+		BoxPlot scatter = new BoxPlot();
+		
+		Map<Double, List<Double>> acuracia = calculaEstatisticas(limiares, Avaliador::acuracia);
+		Map<Double, List<Double>> precisao = calculaEstatisticas(limiares, Avaliador::precisaoPositiva);
+		Map<Double, List<Double>> recall = calculaEstatisticas(limiares, Avaliador::recallPositiva);
+		Map<Double, List<Double>> f1 = calculaEstatisticas(limiares, Avaliador::f1MeasurePositiva);
+		
+		scatter.adicionaEstatistica(acuracia, "Acuracia");
+		scatter.adicionaEstatistica(precisao, "Precisao");
+		scatter.adicionaEstatistica(recall, "Abrangencia");
+		scatter.adicionaEstatistica(f1, "Medida F1");
+		scatter.escreveGrafico();
+	}
+	public Map<Double, List<Double>> calculaEstatisticas(List<Double> limiares, Function<Avaliador, Double> medidaDesempenho){
+		Map<Double, List<Double>> valoresPorLimiar = new HashMap<Double, List<Double>>();
+		for (Double limiar: limiares){
+			List<Double> valores = this.resultados.stream().map(aval -> {
+				aval.avalia(limiar);
+				return medidaDesempenho.apply(aval);
+			}).collect(Collectors.toList());
+			
+			valoresPorLimiar.put(limiar, valores);
+		}
+		return valoresPorLimiar;
+	}
+	
 	@Override
 	public String toString(){
 		StringBuilder sb = new StringBuilder();

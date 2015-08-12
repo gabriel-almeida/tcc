@@ -1,12 +1,16 @@
 package aprendizado;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import modelo.ConjuntoDados;
 
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
 
+import sun.nio.cs.ext.TIS_620;
 import utilidades.AnalisePerformace;
 import utilidades.Matriz;
 
@@ -14,12 +18,17 @@ public class RegressaoLogistica2 implements Regressao {
 	private double coeficienteAprendizado=0.001;
 	private int numPassos=100000;
 	private double erroMinimo= 1E-6;
-	private double normaMinima = 1E-3; //TODO rever esses parametros de treino
-	
+	private double normaMinima = 1E-5; //TODO rever esses parametros de treino
 	private DoubleMatrix pesos;
-
+	
+	private DoubleMatrix validacao;
+	private DoubleMatrix targetValidacao;
+	
+	private List<Double> curvaAprendizadoTreino = new ArrayList<Double>();
+	private List<Double> curvaAprendizadoValidacao = new ArrayList<Double>();;
+	
 	public static final double maxEta = 0.1;
-	public static final double minEta = 0.000001;
+	public static final double minEta = 0.0001;
 
 	public RegressaoLogistica2(){
 	}
@@ -29,6 +38,10 @@ public class RegressaoLogistica2 implements Regressao {
 		this.erroMinimo = erroMinimo;
 	}
 	
+	private double erroMedioQuadratico(DoubleMatrix dataset, DoubleMatrix target){
+		DoubleMatrix h = funcaoHipotese(dataset);
+		return MatrixFunctions.pow(h.sub(target), 2).mean();
+	}
 	private double funcaoVerossimilhanca(DoubleMatrix dataset, DoubleMatrix target){
 		DoubleMatrix h = funcaoHipotese(dataset);
 		DoubleMatrix primeiroTermo = MatrixFunctions.log(h).mul(target);
@@ -60,7 +73,7 @@ public class RegressaoLogistica2 implements Regressao {
 		int quantColunas = dataset.columns;
 
 		this.pesos = DoubleMatrix.ones(quantColunas);
-		this.pesos.mul(0.5);
+		this.pesos = this.pesos.mul(0.1);
 
 		
 		double melhorVerossimilhanca = Double.NEGATIVE_INFINITY;
@@ -70,35 +83,53 @@ public class RegressaoLogistica2 implements Regressao {
 		AnalisePerformace tempo = new AnalisePerformace();
 		
 		//Iteracao principal
-		for (int i = 0; i< numPassos; i++ ){
+		int i;
+		for (i = 0; i< numPassos; i++ ){
 			DoubleMatrix erro = target.sub(this.funcaoHipotese(dataset)); // n x 1
 			DoubleMatrix gradiente = dataset.transpose().mmul(erro); // (n x m)' (n x 1)  = m x 1
+			
+			//if (i > 1000) System.out.println("deu ruim.");
 			
 			this.pesos = this.pesos.add(gradiente.mul(coeficienteAprendizado));
 			
 			double verossimilhancaAtual = funcaoVerossimilhanca(dataset, target);
-			double normaGradiente = gradiente.norm2();
 
+			//Se existir um  conjunto de validacao, coletar estatisticas da curva de aprendizado
+			if (this.validacao != null){
+				this.curvaAprendizadoTreino.add(erroMedioQuadratico(dataset, target));
+				this.curvaAprendizadoValidacao.add(erroMedioQuadratico(validacao, targetValidacao));
+				//this.curvaAprendizadoTreino.add(verossimilhancaAtual/dataset.rows);
+				//this.curvaAprendizadoValidacao.add(funcaoVerossimilhanca(validacao, targetValidacao)/validacao.rows);
+			}
 			
 			//Verifica se eh o melhor modelo ate o momento
-			if (melhorVerossimilhanca < verossimilhancaAtual){
-				melhorVerossimilhanca = verossimilhancaAtual;
+			if (melhorVerossimilhanca < verossimilhancaAtual || i == 0){
 				melhoresPesos = this.pesos;
+				
+				//CRITERIO DE PARADA: MELHORA DE GRADIENTE INSIGNIFICANTE
+				double melhora = Math.abs(melhorVerossimilhanca - verossimilhancaAtual);
+				if (melhora < this.normaMinima){
+					System.out.println("iteracao de parada: " + i +  " Variacao da verossimilhanca: " + melhora + " Melhor vessimilhanca: " + melhorVerossimilhanca  + " melhores pesos :" + this.pesos);
+					break;
+				}
+				this.coeficienteAprendizado = Math.min(0.1, Math.max(0.001, coeficienteAprendizado*1.1));
+				melhorVerossimilhanca = verossimilhancaAtual;
+			}
+			else{
+				this.coeficienteAprendizado = Math.min(0.1, Math.max(0.001, coeficienteAprendizado*0.5));
+				this.pesos = melhoresPesos;
 			}
 			
 			//Criterio de Parada
-			if (normaGradiente < this.normaMinima || i == numPassos - 1){
+			//if (normaGradiente < this.normaMinima || i == numPassos - 1 ){
+			/*if (normaGradiente < this.normaMinima || i == numPassos - 1 ){
 				System.out.println(i +  " Norma Gradiente: " + normaGradiente + " Melhor vessimilhanca: " + melhorVerossimilhanca );
 				break;
-			}
+			}*/
 			
-			//LOG Tempo
-			if (i % 1000 == 0){
-				//System.out.println(melhorVerossimilhanca);
-				tempo.capturaTempo(i);
-			}
 		}
-		this.pesos = melhoresPesos;
+		//this.pesos = melhoresPesos;
+		tempo.capturaTempo(i);
 		tempo.imprimeEstatistica("Regressao Logistica");
 	}
 	/**
@@ -124,7 +155,15 @@ public class RegressaoLogistica2 implements Regressao {
 			
 		treino(treino, target);
 	}
+	
+	//TODO: refatorar: ma ideia por a etapa de avaliacao aqui, idealmente seria um padrao listener
+	public void setValidacao(ConjuntoDados conjDados, List<Integer> indicesValidacao){
+		this.validacao = Matriz.geraMatriz(indicesValidacao, conjDados);
+		this.validacao = Matriz.adicionaColunaBias(this.validacao);
+		this.targetValidacao = Matriz.geraVetorResposta(indicesValidacao, conjDados);
 
+	}
+	
 	@Override
 	public List<Double> classifica(ConjuntoDados conjDados, List<Integer> indicesTeste){
 		DoubleMatrix teste = Matriz.geraMatriz(indicesTeste, conjDados);
@@ -141,6 +180,13 @@ public class RegressaoLogistica2 implements Regressao {
 		DoubleMatrix teste = new DoubleMatrix(features);
 		DoubleMatrix resposta = this.classifica(teste.transpose());
 		return resposta.get(0, 0);
+	}
+	
+	public List<Double> getCurvaAprendizadoTreino() {
+		return curvaAprendizadoTreino;
+	}
+	public List<Double> getCurvaAprendizadoValidacao() {
+		return curvaAprendizadoValidacao;
 	}
 }
 

@@ -44,4 +44,4 @@ regexpRemocao		data		"[^0-9]"
 
 #Especifica qual tipo de extrator de features deve ser usado para cada tipo de dado
 extrator			nome		MetricasSimilaridade
-extrator			data		Levenstein
+extrator			data		Binario

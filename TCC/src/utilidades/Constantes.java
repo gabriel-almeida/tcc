@@ -20,7 +20,7 @@ public abstract class Constantes {
 	public static final double VALOR_POSITIVO = 1.0;
 	public static final double VALOR_NEGATIVO = 0.0;
 	public static final double LIMIAR_PADRAO = 0.5;
-	public static final double PORCENTAGEM_TESTE_PADRAO = 0.2;
+	public static final double PORCENTAGEM_TESTE_PADRAO = 0.3;
 	public static final int REPETICOES_TESTE_CONFIANCA = 50;
 	public static final double TOLERANCIA_PADRAO_DESDUPLICACAO = 0.02;
 	public static final String STRING_IGUAIS = "IGUAIS";

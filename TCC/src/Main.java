@@ -55,7 +55,7 @@ public class Main {
 		boolean supervisaoArquivo = true;
 
 		boolean matching = false;
-		boolean localizaDuplicatas = true;
+		boolean localizaDuplicatas = false;
 		boolean testeConfianca = true;
 		boolean localizaEquivalencia = false;
 
@@ -112,16 +112,17 @@ public class Main {
 
 			ValidacaoCruzada vc = new ValidacaoCruzada(regressao, conjDados, porcentagemTeste);
 		
-			Avaliador a = vc.avalia();
+			Avaliador a = vc.avalia("Curva.png");
 			a.avalia(Constantes.LIMIAR_PADRAO);
 			System.out.println(a.toString());
 		
 			if (testeConfianca){
 				TesteConfianca teste = new TesteConfianca(repeticoesTesteConfianca, vc, limiarClassificacao);
 				teste.calculaConfianca();
-				//System.out.println(teste.toString());
 				List<Double> limiares = Arrays.asList(0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0);
-				teste.estatiticasBrutas(limiares);
+				//teste.estatiticasBrutas(limiares);
+				teste.plota(limiares);
+				System.out.println(teste.toString());
 			}
 			
 		

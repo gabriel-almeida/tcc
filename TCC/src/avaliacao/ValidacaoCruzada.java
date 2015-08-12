@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import utilidades.CurvaAprendizado;
 import modelo.ConjuntoDados;
 import aprendizado.Regressao;
 
@@ -66,7 +67,8 @@ public class ValidacaoCruzada {
 	 * */
 	public Avaliador avalia(){
 		init();
-		List<Double> recebido, esperado;  
+		List<Double> recebido, esperado;
+		
 		regressao.treina(conjDados, indicesTreino);
 		
 		if (this.indicesTeste.size() == 0){
@@ -77,6 +79,31 @@ public class ValidacaoCruzada {
 			recebido  = regressao.classifica(conjDados, indicesTeste);
 			esperado = conjDados.geraListaResposta(indicesTeste); 
 		}
+		
+		return new Avaliador(esperado, recebido);
+	}
+	public Avaliador avalia(String nomeArqCurvaAprendizado){
+		init();
+		List<Double> recebido, esperado;
+		
+		if (nomeArqCurvaAprendizado != null)
+			regressao.setValidacao(conjDados, indicesTeste);
+		
+		regressao.treina(conjDados, indicesTreino);
+		
+		if (this.indicesTeste.size() == 0){
+			recebido  = regressao.classifica(conjDados, indicesTreino);
+			esperado = conjDados.geraListaResposta(indicesTreino);
+			
+		}
+		else{
+			recebido  = regressao.classifica(conjDados, indicesTeste);
+			esperado = conjDados.geraListaResposta(indicesTeste); 
+		}
+		
+		if (nomeArqCurvaAprendizado != null)
+			CurvaAprendizado.plotaCurva(nomeArqCurvaAprendizado, regressao.getCurvaAprendizadoTreino(), regressao.getCurvaAprendizadoValidacao());
+		
 		
 		return new Avaliador(esperado, recebido);
 	}
