@@ -13,7 +13,6 @@ import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.jfree.data.xy.DefaultXYDataset;
 
 public class BoxPlot {
-	public String titulo = "Dispersao das medidas de desempenho em função do limiar";
 	public String eixoX = "limiar";
 	public String eixoY = "valor";
 	
@@ -22,10 +21,11 @@ public class BoxPlot {
 		estatisticasPorLimiar.keySet().stream().sorted()
 			.forEach(limiar -> box.add(estatisticasPorLimiar.get(limiar), nomeEstatistica, limiar));		
 	}
-	public void escreveGrafico(){
-		JFreeChart grafico = ChartFactory.createBoxAndWhiskerChart("titulo", "limiar", "valor", box, true);
+	public void escreveGrafico(String titulo){
+		JFreeChart grafico = ChartFactory.createBoxAndWhiskerChart(titulo, eixoX, eixoY, box, true);
 		try {
-			OutputStream arquivo = new FileOutputStream("grafico.png");
+			String nomeArq = titulo.replaceAll("[ ]+", "_");
+			OutputStream arquivo = new FileOutputStream(nomeArq + ".png");
 			ChartUtilities.writeChartAsPNG(arquivo, grafico, 1040, 800);
 			arquivo.close();
 		} catch (IOException e) {

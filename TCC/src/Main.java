@@ -1,18 +1,14 @@
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
+
+import modelo.ConjuntoDados;
+import modelo.Elemento;
 
 import org.jblas.DoubleMatrix;
 
-import desduplicacao.Desduplicador;
-import modelo.ConjuntoDados;
-import modelo.Elemento;
-import processamento.PreProcessamento;
 import supervisao.Supervisao;
 import supervisao.SupervisaoArquivo;
 import supervisao.SupervisaoHumana;
@@ -20,22 +16,18 @@ import utilidades.Constantes;
 import utilidades.Matriz;
 import aprendizado.MetricaRegressao;
 import aprendizado.Regressao;
-import aprendizado.RegressaoLinear;
-import aprendizado.RegressaoLogistica;
-import aprendizado.RegressaoZeroR;
+import aprendizado.RegressaoLogistica2;
 import avaliacao.Avaliador;
 import avaliacao.TesteConfianca;
 import avaliacao.ValidacaoCruzada;
+import desduplicacao.Desduplicador;
 import entrada_saida.AmostragemAleatoria;
 import entrada_saida.ArquivoConfiguracao;
-import entrada_saida.CategorizacaoPorFaixas;
 import entrada_saida.EntradaCSV;
 import entrada_saida.GerenciadorBases;
-import entrada_saida.PreenchimentoPrimeiroCampo;
 import entrada_saida.SaidaCSV;
 import entrada_saida.SerializacaoRegressao;
 import extracaoFeatures.ExtratorFeatures;
-import extracaoFeatures.IgualdadePrimeiroCampo;
 
 public class Main {
 	public static String arqConfiguracao = "configuracao.txt";
@@ -123,17 +115,24 @@ public class Main {
 			Files.write(Paths.get("./dataset.txt"), ds.toString().getBytes());
 			Files.write(Paths.get("./target.txt"), target.toString().getBytes());
 						
-			
 			//PREPARA TREINO
 			Regressao regressao = Constantes.REGRESSAO_PADRAO;
-
 			ValidacaoCruzada vc = new ValidacaoCruzada(regressao, conjDados, porcentagemTeste);
-		
-			Avaliador a = vc.avalia("Curva.png");
-			//Avaliador a = vc.avalia();
+			
+			Avaliador a;
+			/*Avaliador a = vc.avalia("Curva.png");
 			a.avalia(Constantes.LIMIAR_PADRAO);
 			System.out.println(a.toString());
-		
+			*/
+			
+			for (int i=0; i< 1; i++){
+				regressao = new RegressaoLogistica2();
+				vc = new ValidacaoCruzada(regressao, conjDados, porcentagemTeste);
+				a = vc.avalia("curva_aprendizado" + (i+1) + ".png");
+				a.avalia(Constantes.LIMIAR_PADRAO);
+				System.out.println(a.toString());
+			}
+			
 			if (testeConfianca){
 				TesteConfianca teste = new TesteConfianca(repeticoesTesteConfianca, vc, limiarClassificacao);
 				teste.calculaConfianca();

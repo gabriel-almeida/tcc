@@ -2,6 +2,8 @@ package avaliacao;
 
 import java.util.List;
 
+import com.sun.org.glassfish.external.statistics.annotations.Reset;
+
 import utilidades.Constantes;
 
 
@@ -14,7 +16,13 @@ public class Avaliador {
 	private int falsoPositivo = 0;
 	private int falsoNegativo = 0;
 	private double ultimoLimiar;
-
+	
+	public void limpaEstatisticas(){
+		verdadeiroPositivo = 0;
+		verdadeiroNegativo = 0;
+		falsoPositivo = 0;
+		falsoNegativo = 0;
+	}
 	public double getVerdadeiroPositivo() {
 		return verdadeiroPositivo;
 	}
@@ -55,7 +63,8 @@ public class Avaliador {
 
 	public void avalia(double limiar){
 		this.ultimoLimiar = limiar;
-
+		limpaEstatisticas();
+		
 		for (int i = 0; i < esperado.size(); i++){
 			double target = esperado.get(i);
 			double obtido = recebido.get(i) >= limiar? Constantes.VALOR_POSITIVO: Constantes.VALOR_NEGATIVO;

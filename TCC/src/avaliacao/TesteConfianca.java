@@ -1,5 +1,7 @@
 package avaliacao;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +12,7 @@ import java.util.stream.IntStream;
 
 import utilidades.AnalisePerformace;
 import utilidades.BoxPlot;
+import utilidades.Constantes;
 import utilidades.ScatterPlot;
 
 public class TesteConfianca {
@@ -58,32 +61,43 @@ public class TesteConfianca {
 		return new double[]{mediaAmostral, intervalo};
 	}
 
-	public void estatiticasBrutas(List<Double> limiares){
-		StringBuilder sbPositivo = new StringBuilder();
-
-		for (Double limiarAtual:  limiares){
-			for (Avaliador avaliador : this.resultados){
-				avaliador.avalia(limiarAtual);
-				sbPositivo.append(avaliador.estatisticasPositivas() + "\n");
-			}
-		}
-		System.out.println("Estatisticas Positivas:");
-		System.out.println(sbPositivo);
-	}
-	public void plota(List<Double> limiares){
-		BoxPlot scatter = new BoxPlot();
-		
+//	public void estatiticasBrutas(List<Double> limiares){
+//		StringBuilder sbPositivo = new StringBuilder();
+//
+//		for (Double limiarAtual:  limiares){
+//			for (Avaliador avaliador : this.resultados){
+//				avaliador.avalia(limiarAtual);
+//				sbPositivo.append(avaliador.estatisticasPositivas() + "\n");
+//			}
+//		}
+//		System.out.println("Estatisticas Positivas:");
+//		System.out.println(sbPositivo);
+//	}
+	public void plota(List<Double> limiares){		
 		Map<Double, List<Double>> acuracia = calculaEstatisticas(limiares, Avaliador::acuracia);
 		Map<Double, List<Double>> precisao = calculaEstatisticas(limiares, Avaliador::precisaoPositiva);
 		Map<Double, List<Double>> recall = calculaEstatisticas(limiares, Avaliador::recallPositiva);
 		Map<Double, List<Double>> f1 = calculaEstatisticas(limiares, Avaliador::f1MeasurePositiva);
 		
-		scatter.adicionaEstatistica(acuracia, "Acuracia");
-		scatter.adicionaEstatistica(precisao, "Precisao");
-		scatter.adicionaEstatistica(recall, "Abrangencia");
-		scatter.adicionaEstatistica(f1, "Medida F1");
-		scatter.escreveGrafico();
+		BoxPlot boxAcuraciaF1 = new BoxPlot();
+		boxAcuraciaF1.adicionaEstatistica(acuracia, "Acurácia");
+		boxAcuraciaF1.adicionaEstatistica(f1, "Medida F1");
+		boxAcuraciaF1.escreveGrafico("Acurácia e medida F1 em função do limiar");
+		
+		BoxPlot boxPrecisionRecall = new BoxPlot();
+		boxPrecisionRecall.adicionaEstatistica(precisao, "Precisão");
+		boxPrecisionRecall.adicionaEstatistica(recall, "Abrangencia");
+		boxPrecisionRecall.escreveGrafico("Precisão e Abrangência em função do limiar");
 	}
+	
+	public void salvaMatrizConfusao(List<Double> limiares){
+		Map<Double, List<Double>> vp = calculaEstatisticas(limiares, Avaliador::getVerdadeiroPositivo);
+		calculaEstatisticas(limiares, Avaliador::getFalsoPositivo);
+		calculaEstatisticas(limiares, Avaliador::getVerdadeiroNegativo);
+		calculaEstatisticas(limiares, Avaliador::getFalsoNegativo);
+		
+	}
+	
 	public Map<Double, List<Double>> calculaEstatisticas(List<Double> limiares, Function<Avaliador, Double> medidaDesempenho){
 		Map<Double, List<Double>> valoresPorLimiar = new HashMap<Double, List<Double>>();
 		for (Double limiar: limiares){
@@ -100,7 +114,8 @@ public class TesteConfianca {
 	@Override
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
-
+		resultados.stream().forEach(a -> a.avalia(0.5));
+		
 		sb.append("\nAcuracia          = ");
 		double acuracia[] = intervaloConfianca(Avaliador::acuracia);
 		sb.append(String.format(formatacaoIntervaloConfianca, acuracia[0], acuracia[1]));

@@ -18,7 +18,7 @@ public class RegressaoLogistica2 implements Regressao {
 	private double coeficienteAprendizado=0.001;
 	private int numPassos=10000;
 	private double erroMinimo= 1E-6;
-	private double normaMinima = 1E-5; //TODO rever esses parametros de treino
+	private double normaMinima = 1E-4; //TODO rever esses parametros de treino
 	private DoubleMatrix pesos;
 	
 	private DoubleMatrix validacao;
@@ -96,7 +96,7 @@ public class RegressaoLogistica2 implements Regressao {
 			/*DoubleMatrix penalidade = this.pesos.div(norma).mul(-0.01);
 			penalidade.put(penalidade.length - 1, 0.0);*/
 			
-			this.pesos = this.pesos.add(gradiente.mul(coeficienteAprendizado)).sub(norma*0.1);
+			this.pesos = this.pesos.add(gradiente.mul(coeficienteAprendizado)).sub(norma*0.0);
 			
 			
 			double verossimilhancaAtual = funcaoVerossimilhanca(dataset, target);
