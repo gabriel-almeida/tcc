@@ -24,6 +24,9 @@ public class ValidacaoCruzada {
 
 		this.rand = new Random();
 	}
+	public Regressao getRegressao(){
+		return this.regressao;
+	}
 	public void setRandom(Random rand){
 		this.rand = rand;
 	}
