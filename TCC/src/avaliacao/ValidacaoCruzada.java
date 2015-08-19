@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import utilidades.CurvaAprendizado;
+import utilidades.LinePlot;
 import modelo.ConjuntoDados;
 import aprendizado.Regressao;
 
@@ -105,7 +105,7 @@ public class ValidacaoCruzada {
 		}
 		
 		if (nomeArqCurvaAprendizado != null)
-			CurvaAprendizado.plotaCurva(nomeArqCurvaAprendizado, regressao.getCurvaAprendizadoTreino(), regressao.getCurvaAprendizadoValidacao());
+			LinePlot.plotaCurvaAprendizado(regressao.getCurvaAprendizadoTreino(), regressao.getCurvaAprendizadoValidacao());
 		
 		
 		return new Avaliador(esperado, recebido);

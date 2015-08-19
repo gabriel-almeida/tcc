@@ -1,41 +1,50 @@
 package aprendizado;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import modelo.ConjuntoDados;
 
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
 
-import sun.nio.cs.ext.TIS_620;
 import utilidades.AnalisePerformace;
 import utilidades.Matriz;
 
 public class RegressaoLogistica2 implements Regressao {
-	private double coeficienteAprendizado=0.001;
-	private int numPassos=10000;
-	private double erroMinimo= 1E-6;
-	private double normaMinima = 1E-4; //TODO rever esses parametros de treino
+	//Numeros magicos
+	private double coeficienteRegularizacao = 0.0;
+	private double coeficienteAprendizadoInicial = 0.001;
+	private double coeficienteAprendizadoAtual;
+	private int numMaximoPassos = 1000;
+	private double variacaoMinimaErro = 1E-4;
+	public static final double maxCoeficienteAprendizado = 0.1;
+	public static final double minCoeficienteAprendizado = 0.0001;
+	private double coefBoldDriverMelhora = 1.1;
+	private double coefBoldDriverPiora = 0.5;
+	
+
+	//Modelo
 	private DoubleMatrix pesos;
 	
+	//Informacoes para gerar a curva de aprendizado
 	private DoubleMatrix validacao;
 	private DoubleMatrix targetValidacao;
-	
 	private List<Double> curvaAprendizadoTreino = new ArrayList<Double>();
 	private List<Double> curvaAprendizadoValidacao = new ArrayList<Double>();;
 	
-	public static final double maxEta = 0.1;
-	public static final double minEta = 0.0001;
-
+	
 	public RegressaoLogistica2(){
 	}
-	public RegressaoLogistica2(double coeficienteAprendizado, int numPassos, double erroMinimo){
-		this.coeficienteAprendizado=coeficienteAprendizado;
-		this.numPassos = numPassos;
-		this.erroMinimo = erroMinimo;
+	
+	public RegressaoLogistica2(double coeficienteAprendizadoInicial, int numPassos, double variacaoMinimaErro){
+		this.coeficienteAprendizadoInicial = coeficienteAprendizadoInicial;
+		this.numMaximoPassos = numPassos;
+		this.variacaoMinimaErro = variacaoMinimaErro;
+	}
+	
+	public void setCoeficienteRegularizacao(double coeficiente){
+		this.coeficienteRegularizacao = coeficiente; 
 	}
 	
 	private double erroMedioQuadratico(DoubleMatrix dataset, DoubleMatrix target){
@@ -65,17 +74,19 @@ public class RegressaoLogistica2 implements Regressao {
 	 * Espera que o target seja um vetor coluna binario de -1 e 1.
 	 */
 	private void treino(DoubleMatrix dataset, DoubleMatrix target){
+		//Teste de sanidade
 		if (dataset.rows != target.rows){
 			throw new RuntimeException("Dataset e target devem ter a mesma quantidade de linhas");
 		}
 		
+		//Prepara bias/intercept
 		dataset = Matriz.adicionaColunaBias(dataset);
 		int quantColunas = dataset.columns;
 
+		//Inicializa pesos: acho que nao importa muito o valor inicial
 		this.pesos = DoubleMatrix.ones(quantColunas);
-		this.pesos = this.pesos.mul(0.1);
 
-		
+		//Registro do melhor modelo
 		double melhorVerossimilhanca = Double.NEGATIVE_INFINITY;
 		DoubleMatrix melhoresPesos = null;
 		
@@ -84,19 +95,17 @@ public class RegressaoLogistica2 implements Regressao {
 		
 		//Iteracao principal
 		int i;
-		for (i = 0; i< numPassos; i++ ){
+		this.coeficienteAprendizadoAtual = this.coeficienteAprendizadoInicial;
+		for (i = 0; i< numMaximoPassos; i++ ){
 			DoubleMatrix erro = target.sub(this.funcaoHipotese(dataset)); // n x 1
 			DoubleMatrix gradiente = dataset.transpose().mmul(erro); // (n x m)' (n x 1)  = m x 1
 			
-			//if (i > 1000) System.out.println("deu ruim.");
+			//Regularizacao		
+			double norma = this.pesos.norm2();
+			DoubleMatrix penalidadeR2 = this.pesos.div(norma).mul(coeficienteRegularizacao);
 			
-			
-			DoubleMatrix a = this.pesos.dup().put(this.pesos.length - 1, 0.0);
-			double norma = a.norm2();
-			/*DoubleMatrix penalidade = this.pesos.div(norma).mul(-0.01);
-			penalidade.put(penalidade.length - 1, 0.0);*/
-			
-			this.pesos = this.pesos.add(gradiente.mul(coeficienteAprendizado)).sub(norma*0.0);
+			//Atualizacao
+			this.pesos = this.pesos.add(gradiente.mul(coeficienteAprendizadoAtual)).sub(penalidadeR2);
 			
 			
 			double verossimilhancaAtual = funcaoVerossimilhanca(dataset, target);
@@ -105,8 +114,6 @@ public class RegressaoLogistica2 implements Regressao {
 			if (this.validacao != null){
 				this.curvaAprendizadoTreino.add(erroMedioQuadratico(dataset, target));
 				this.curvaAprendizadoValidacao.add(erroMedioQuadratico(validacao, targetValidacao));
-				//this.curvaAprendizadoTreino.add(verossimilhancaAtual/dataset.rows);
-				//this.curvaAprendizadoValidacao.add(funcaoVerossimilhanca(validacao, targetValidacao)/validacao.rows);
 			}
 			
 			//Verifica se eh o melhor modelo ate o momento
@@ -115,26 +122,22 @@ public class RegressaoLogistica2 implements Regressao {
 				
 				//CRITERIO DE PARADA: MELHORA DE GRADIENTE INSIGNIFICANTE
 				double melhora = Math.abs(melhorVerossimilhanca - verossimilhancaAtual);
-				if (melhora < this.normaMinima){
+				if (melhora < this.variacaoMinimaErro){
 					break;
 				}
-				this.coeficienteAprendizado = Math.min(0.1, Math.max(0.0001, coeficienteAprendizado*1.1));
+				//Heuristica do Bold Driver: se melhora, aumento um pouco meu coeficiente de aprendizado
+				this.coeficienteAprendizadoAtual = Math.min(maxCoeficienteAprendizado, Math.max(minCoeficienteAprendizado, coeficienteAprendizadoAtual*coefBoldDriverMelhora));
 				melhorVerossimilhanca = verossimilhancaAtual;
 			}
+			//Senao for o melhor modelo, rollback
 			else{
-				this.coeficienteAprendizado = Math.min(0.1, Math.max(0.0001, coeficienteAprendizado*0.5));
+				//Heuristica do Bold Driver: se piora, diminuo muito meu coeficiente de aprendizado
+				this.coeficienteAprendizadoAtual = Math.min(maxCoeficienteAprendizado, Math.max(minCoeficienteAprendizado, coeficienteAprendizadoAtual*coefBoldDriverPiora));
 				this.pesos = melhoresPesos;
 			}
 			
-			//Criterio de Parada
-			//if (normaGradiente < this.normaMinima || i == numPassos - 1 ){
-			/*if (normaGradiente < this.normaMinima || i == numPassos - 1 ){
-				System.out.println(i +  " Norma Gradiente: " + normaGradiente + " Melhor vessimilhanca: " + melhorVerossimilhanca );
-				break;
-			}*/
 			
 		}
-		//this.pesos = melhoresPesos;
 		tempo.capturaTempo(i);
 		System.out.println("iteracao de parada: " + i + " Melhor vessimilhanca: " + melhorVerossimilhanca  + " melhores pesos :" + this.pesos);
 		tempo.imprimeEstatistica("Regressao Logistica");
@@ -156,10 +159,6 @@ public class RegressaoLogistica2 implements Regressao {
 		DoubleMatrix treino = Matriz.geraMatriz(indices, conjDados);
 		DoubleMatrix target = Matriz.geraVetorResposta(indices, conjDados);
 		
-		//Forca a binarizacao entre -1 e 1
-		//DoubleMatrix targetsNegativos = target.eq(Constantes.VALOR_NEGATIVO);
-		//target.put(targetsNegativos, -1.0);
-			
 		treino(treino, target);
 	}
 	
@@ -179,7 +178,7 @@ public class RegressaoLogistica2 implements Regressao {
 	}
 	@Override
 	public Object clone(){
-		RegressaoLogistica2 novaRegressao = new RegressaoLogistica2(this.coeficienteAprendizado, this.numPassos, this.erroMinimo);
+		RegressaoLogistica2 novaRegressao = new RegressaoLogistica2(this.coeficienteAprendizadoInicial, this.numMaximoPassos, this.variacaoMinimaErro);		novaRegressao.coeficienteRegularizacao = this.coeficienteRegularizacao;
 		return novaRegressao;
 	}
 	@Override

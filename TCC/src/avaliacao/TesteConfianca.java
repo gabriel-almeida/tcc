@@ -1,7 +1,7 @@
 package avaliacao;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,11 +12,12 @@ import java.util.stream.IntStream;
 
 import utilidades.AnalisePerformace;
 import utilidades.BoxPlot;
-import utilidades.Constantes;
-import utilidades.ScatterPlot;
+import utilidades.LinePlot;
+import aprendizado.Regressao;
 
 public class TesteConfianca {
 	private List<Avaliador> resultados;
+	private List<Regressao> regressoes;
 	private int numTestes; 
 	private ValidacaoCruzada validacao;
 	private double limiar;
@@ -35,11 +36,12 @@ public class TesteConfianca {
 
 	public void calculaConfianca(){
 		AnalisePerformace tempo = new AnalisePerformace();
-
+		regressoes = Collections.synchronizedList(new ArrayList<Regressao>());
 		resultados = IntStream.range(0, numTestes).parallel().mapToObj(i-> {
 			ValidacaoCruzada novaValidacao = (ValidacaoCruzada) validacao.clone();
 			Avaliador a = novaValidacao.avalia();
 			a.avalia(limiar);
+			regressoes.add(novaValidacao.getRegressao());
 			return a;
 		}).collect(Collectors.toList());
 
@@ -79,23 +81,15 @@ public class TesteConfianca {
 		Map<Double, List<Double>> recall = calculaEstatisticas(limiares, Avaliador::recallPositiva);
 		Map<Double, List<Double>> f1 = calculaEstatisticas(limiares, Avaliador::f1MeasurePositiva);
 		
-		BoxPlot boxAcuraciaF1 = new BoxPlot();
-		boxAcuraciaF1.adicionaEstatistica(acuracia, "Acurácia");
-		boxAcuraciaF1.adicionaEstatistica(f1, "Medida F1");
-		boxAcuraciaF1.escreveGrafico("Acurácia e medida F1 em função do limiar");
+		LinePlot lineAcuraciaF1 = new LinePlot("Acurácia e medida F1 em função do limiar", "Limiar", "Valor (porcentual)");
+		lineAcuraciaF1.adicionaMedias(acuracia, "Acurácia");
+		lineAcuraciaF1.adicionaMedias(f1, "Medida F1");
+		lineAcuraciaF1.plotaCurva("acuracy-f1");
 		
-		BoxPlot boxPrecisionRecall = new BoxPlot();
+		BoxPlot boxPrecisionRecall = new BoxPlot("Precisão e abrangência em função do limiar", "Limiar", "Valor (porcentual)");
 		boxPrecisionRecall.adicionaEstatistica(precisao, "Precisão");
 		boxPrecisionRecall.adicionaEstatistica(recall, "Abrangencia");
-		boxPrecisionRecall.escreveGrafico("Precisão e Abrangência em função do limiar");
-	}
-	
-	public void salvaMatrizConfusao(List<Double> limiares){
-		Map<Double, List<Double>> vp = calculaEstatisticas(limiares, Avaliador::getVerdadeiroPositivo);
-		calculaEstatisticas(limiares, Avaliador::getFalsoPositivo);
-		calculaEstatisticas(limiares, Avaliador::getVerdadeiroNegativo);
-		calculaEstatisticas(limiares, Avaliador::getFalsoNegativo);
-		
+		boxPrecisionRecall.escreveGrafico("precision-recall");
 	}
 	
 	public Map<Double, List<Double>> calculaEstatisticas(List<Double> limiares, Function<Avaliador, Double> medidaDesempenho){

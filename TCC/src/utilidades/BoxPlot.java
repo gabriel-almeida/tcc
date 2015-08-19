@@ -21,10 +21,17 @@ import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
  * dos valores passados pela funcao adicionaEstatistica(). 
  * Usa de forma customizada a JFreeChart */
 public class BoxPlot {
-	public String eixoX = "Limiar";
-	public String eixoY = "Valor (decimal)";
-
+	private String eixoX;
+	private String eixoY;
+	private String titulo;
+	
 	private DefaultBoxAndWhiskerCategoryDataset box = new DefaultBoxAndWhiskerCategoryDataset();
+	
+	public BoxPlot(String titulo, String eixoX, String eixoY){
+		this.eixoX = eixoX;
+		this.eixoY = eixoY;
+		this.titulo = titulo;
+	}
 	
 	public void adicionaEstatistica(Map<Double, List<Double>> estatisticasPorLimiar, String nomeEstatistica) {
 		estatisticasPorLimiar.keySet().stream().sorted()
@@ -32,10 +39,9 @@ public class BoxPlot {
 	}
 	
 	/**Escreve o grafico num arquivo PNG, usando seu titulo como nome*/
-	public void escreveGrafico(String titulo){
-		JFreeChart grafico = geraPlot(titulo); 
+	public void escreveGrafico(String nomeArq){
+		JFreeChart grafico = geraPlot(this.titulo); 
 		try {
-			String nomeArq = titulo.replaceAll("[ ]+", "_");
 			OutputStream arquivo = new FileOutputStream(nomeArq + ".png");
 			ChartUtilities.writeChartAsPNG(arquivo, grafico, 1040, 800);
 			arquivo.close();
