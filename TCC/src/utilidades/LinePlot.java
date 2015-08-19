@@ -21,13 +21,21 @@ public class LinePlot {
 	private String eixoX;
 	private String eixoY;
 	private String titulo;
-
+	private boolean plotaShapes = true;
 	private DefaultXYDataset ds = new DefaultXYDataset();
 	
 	public LinePlot(String titulo, String eixoX, String eixoY){
 		this.eixoX = eixoX;
 		this.eixoY = eixoY;
 		this.titulo = titulo;
+	}
+	
+	public void ativaPlotShapes(){
+		plotaShapes = true;
+	}
+	
+	public void desativaPlotShapes(){
+		plotaShapes = false;
 	}
 	
 	public void adicionaMedias(Map<Double, List<Double>> dados, String nomeSerie){
@@ -55,6 +63,7 @@ public class LinePlot {
 		
 		grafico.ds.addSeries("Treinamento", tabelaPontos(curvaTreino));
 		grafico.ds.addSeries("Teste", tabelaPontos(curvaValidacao));
+		grafico.desativaPlotShapes();
 		
 		grafico.plotaCurva("curva_aprendizado");
 	}
@@ -62,13 +71,9 @@ public class LinePlot {
 	/** Retorna o grafico da JFreeChart */
 	public JFreeChart plotaCurva(String nomeArquivo){
 		 NumberAxis xAxis = new NumberAxis(eixoX);
-		 xAxis.setRange(0.0, 1.0);
-		 
 		 NumberAxis yAxis = new NumberAxis(eixoY);
 		 
-		 XYItemRenderer renderer = new XYLineAndShapeRenderer(true, true);
-		 //renderer.setBaseItemLabelsVisible(true);
-		 renderer.setBaseSeriesVisible(true);
+		 XYItemRenderer renderer = new XYLineAndShapeRenderer(true, plotaShapes);
 		 
 		 XYPlot plot = new XYPlot(this.ds, xAxis, yAxis, renderer);
 		 plot.setOrientation(PlotOrientation.VERTICAL);
